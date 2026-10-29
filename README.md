@@ -35,4 +35,4 @@ Ein Update wird als geprüftes ZIP manuell installiert. Keine Fernsteuerung und 
 
 Pläne und Laufbelege bleiben beim Deaktivieren oder Löschen erhalten. Sie verhindern doppelte Übergaben nach einer Neuinstallation. Datenbankänderungen vor einem Downgrade prüfen; ein Code-Rollback allein stellt keine Daten wieder her.
 
-[Entwicklung und Tests](docs/development.md) · [Adapter-Vertrag](docs/adapters.md) · [Änderungen](CHANGELOG.md)
+[Entwicklung und Tests](docs/development.md) · [Prüfergebnisse](docs/verification.md) · [Adapter-Vertrag](docs/adapters.md) · [Änderungen](CHANGELOG.md)

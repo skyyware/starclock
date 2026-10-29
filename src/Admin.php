@@ -70,10 +70,10 @@ final class Admin
         }
     }
 
-    private function button(array $plan, string $operation, string $label, bool $primary = false): void
+    private function button(array $plan, string $operation, string $label, bool $primary = false, bool $disabled = false): void
     {
         $this->formStart($plan, $operation);
-        echo '<button class="button ' . ($primary ? 'button-primary' : '') . '">' . esc_html($label) . '</button></form>';
+        echo '<button class="button ' . ($primary ? 'button-primary' : '') . '"' . ($disabled ? ' disabled' : '') . '>' . esc_html($label) . '</button></form>';
     }
 
     public function page(): void
@@ -81,7 +81,7 @@ final class Admin
         if (!self::authorized()) {
             wp_die(esc_html__('Du brauchst Website- und MailPoet-Verwaltungsrechte.', 'starclock'), '', ['response' => 403]);
         }
-        echo '<div class="wrap starclock"><header class="sc-header"><div><h1>Starclock</h1><p>Wiederkehrende E-Mails</p></div>';
+        echo '<div class="wrap starclock"><h1>Starclock</h1><hr class="wp-header-end"><header class="sc-header"><p>Wiederkehrende E-Mails</p>';
         echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=starclock&new=1')) . '">Neuer Zeitplan</a></header>';
         $notice = get_transient('starclock_notice_' . get_current_user_id());
         if ($notice) {
@@ -125,12 +125,17 @@ final class Admin
         if (!empty($plan['approved'])) {
             echo '<dl class="sc-summary"><dt>Mail</dt><dd>' . esc_html($plan['approved']['subject']) . '</dd><dt>Empfänger</dt><dd>' . esc_html(implode(', ', $plan['approved']['lists'])) . '</dd><dt>Absender</dt><dd>' . esc_html($plan['approved']['sender']) . '</dd><dt>Antworten an</dt><dd>' . esc_html($plan['approved']['reply_to']) . '</dd></dl>';
         }
-        echo '<p class="sc-note">' . esc_html($plan['notice'] ?? '') . '</p><div class="sc-actions">';
+        echo '<p class="sc-note">' . esc_html($plan['notice'] ?? '') . '</p>';
+        $activationProblem = $plan['status'] === 'ready' ? $this->engine->activationProblem($plan) : null;
+        if ($activationProblem) {
+            echo '<p class="sc-warning">' . esc_html($activationProblem) . '</p>';
+        }
+        echo '<div class="sc-actions">';
         if ($plan['status'] === 'active') {
             $this->button($plan, 'pause', 'Pausieren');
             $this->button($plan, 'skip', 'Nächsten Lauf auslassen');
         } elseif ($plan['status'] === 'ready') {
-            $this->button($plan, 'enable', 'Automatik aktivieren', true);
+            $this->button($plan, 'enable', 'Automatik aktivieren', true, $activationProblem !== null);
             $this->button($plan, 'pause', 'Pausiert lassen');
         } elseif ($this->engine->store->pending($plan['id'])) {
             $this->button($plan, 'resolve', 'Unterbrochene Läufe schließen', true);
@@ -139,6 +144,9 @@ final class Admin
         }
         if (!$detail) {
             echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=starclock&plan=' . $plan['id'])) . '">Bearbeiten & Verlauf</a>';
+        }
+        if ($plan['adapter'] === 'mailpoet') {
+            echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=mailpoet-newsletter-editor&id=' . $plan['template_id'])) . '">Vorlage in MailPoet öffnen</a>';
         }
         echo '</div>';
         if ($plan['status'] === 'ready') {
@@ -190,16 +198,16 @@ final class Admin
 
     private function input(string $name, string $label, string $value, string $type, string $extra = ''): void
     {
-        echo '<label class="sc-field" for="sc-' . esc_attr($name) . '"><span>' . esc_html($label) . '</span><input required id="sc-' . esc_attr($name) . '" name="' . esc_attr($name) . '" type="' . esc_attr($type) . '" value="' . esc_attr($value) . '" ' . $extra . '></label>';
+        echo '<div class="sc-field"><label for="sc-' . esc_attr($name) . '">' . esc_html($label) . '</label><input required id="sc-' . esc_attr($name) . '" name="' . esc_attr($name) . '" type="' . esc_attr($type) . '" value="' . esc_attr($value) . '" ' . $extra . '></div>';
     }
 
     private function select(string $name, string $label, array $options, mixed $value): void
     {
-        echo '<label class="sc-field" for="sc-' . esc_attr($name) . '"><span>' . esc_html($label) . '</span><select required id="sc-' . esc_attr($name) . '" name="' . esc_attr($name) . '">';
+        echo '<div class="sc-field"><label for="sc-' . esc_attr($name) . '">' . esc_html($label) . '</label><select required id="sc-' . esc_attr($name) . '" name="' . esc_attr($name) . '">';
         foreach ($options as $key => $text) {
             echo '<option value="' . esc_attr((string)$key) . '" ' . selected((string)$value, (string)$key, false) . '>' . esc_html($text) . '</option>';
         }
-        echo '</select></label>';
+        echo '</select></div>';
     }
 
     private function history(array $plan): void

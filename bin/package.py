@@ -10,6 +10,7 @@ header = (root / 'starclock.php').read_text()
 version = re.search(r'Version: ([0-9.]+)', header).group(1)
 files = [root / 'starclock.php', root / 'README.md', root / 'LICENSE', root / 'CHANGELOG.md']
 files += sorted((root / 'src').glob('*.php')) + sorted((root / 'assets').glob('*'))
+files += sorted((root / 'docs').glob('*.md'))
 for source in files:
     if source.suffix == '.php':
         subprocess.run(['php', '-l', str(source)], check=True, capture_output=True)

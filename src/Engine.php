@@ -27,6 +27,19 @@ final class Engine
         return $this->adapters;
     }
 
+    public function activationProblem(array $plan): ?string
+    {
+        if (!$this->canActivate || $plan['site'] !== $this->site) {
+            return 'Die Aktivierung ist in dieser Umgebung gesperrt.';
+        }
+        try {
+            $this->adapter($plan['adapter'])->available();
+        } catch (Throwable $error) {
+            return $error->getMessage();
+        }
+        return null;
+    }
+
     public function save(array $input, int $id, int $revision): array
     {
         return $this->store->locked('plans', function () use ($input, $id, $revision): array {

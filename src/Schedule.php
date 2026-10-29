@@ -72,6 +72,9 @@ final class Schedule
     public static function next(array $plan, DateTimeImmutable $now): ?DateTimeImmutable
     {
         $cursor = $now->setTimezone(new DateTimeZone($plan['timezone']))->setTime(12, 0);
+        if ((int)($plan['not_before'] ?? 0) > $now->getTimestamp()) {
+            $cursor = $cursor->setTimestamp((int)$plan['not_before'])->setTime(12, 0);
+        }
         if ($cursor->format('Y-m-d') < $plan['start_date']) {
             $cursor = new DateTimeImmutable($plan['start_date'] . ' 12:00', new DateTimeZone($plan['timezone']));
         }

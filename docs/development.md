@@ -31,6 +31,8 @@ php /path/to/wp-cli.phar --path=/path/to/synthetic-wordpress eval 'require "/pat
 
 Der Test legt eindeutig markierte Listen, Kontakte, Vorlagen und Laufbelege an. Der echte MailPoet-Worker ermittelt Empfänger. Ein nachgeschalteter Testfilter verwirft alle Empfänger vor dem gesperrten Transport. Die Testpläne enden pausiert. Nach dem Test offene eigene Jobs prüfen und den isolierten Datenbankprozess beenden. Nachweise behalten; keine ungezielte Bereinigung.
 
+`tests/handoff-failure.php` erzeugt einen Fehler nach einer tatsächlich angelegten MailPoet-Queue. `tests/admin-security.php` prüft Rechte und Nonces. `tests/concurrency.php` reserviert den über `STARCLOCK_RACE_PLAN` übergebenen synthetischen Plan. `tests/tick-race.php` führt den vollständigen Tick zum kontrollierten Testtermin aus. Parallele Aufrufe ausschließlich im gleichen isolierten Testsystem starten und danach die eigene Kampagne pausieren. Die Betriebssystem-Sperre bleibt dabei aktiv.
+
 Die temporäre Konstante `STARCLOCK_ALLOW_NONPRODUCTION` erlaubt Aktivierung ausschließlich für separat gesicherte Tests. Sie stellt selbst keine Versandsperre her und gehört nicht in ein Kunden-Stage-System.
 
 ## Release prüfen

@@ -22,6 +22,7 @@ $check('Window is exclusive at the end', Schedule::due($base, new DateTimeImmuta
 $check('Never catches up on Tuesday', Schedule::due($base, new DateTimeImmutable('2026-10-27 01:00 Europe/Berlin')) === null);
 $check('Start date respected', Schedule::due(array_replace($base, ['start_date' => '2026-11-01']), new DateTimeImmutable('2026-10-26 18:30 Europe/Berlin')) === null);
 $check('Enabling after due waits a week', Schedule::due($base + ['not_before' => strtotime('2026-10-26 18:31 Europe/Berlin')], new DateTimeImmutable('2026-10-26 18:32 Europe/Berlin')) === null);
+$check('Future activation bound has visible next date', Schedule::next($base + ['not_before' => strtotime('2026-12-14 18:31 Europe/Berlin')], new DateTimeImmutable('2026-10-26 18:32 Europe/Berlin'))?->format('Y-m-d') === '2026-12-21');
 $sunday = array_replace($base, ['weekday' => 7, 'time' => '02:30']);
 $check('Nonexistent DST wall time skipped', Schedule::onDate($sunday, '2026-03-29') === null);
 $check('Repeated DST time uses first occurrence', Schedule::onDate($sunday, '2026-10-25')?->format('c') === '2026-10-25T02:30:00+02:00');
