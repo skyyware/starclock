@@ -40,3 +40,17 @@ Die temporäre Konstante `STARCLOCK_ALLOW_NONPRODUCTION` erlaubt Aktivierung aus
 Vor einer neuen Version die Zeittests, die echte MailPoet-Integration und konkurrierende Reservierungen prüfen. Den Admin ohne MailPoet, mit ungültigem Formular, als unberechtigter Benutzer und in schmaler Ansicht kontrollieren. Eine erfolgreiche Übergabe ist kein SMTP- oder Zustelltest.
 
 Versionsnummer, dokumentierte Kompatibilität und Paket zusammen ändern. Ein neues ZIP lokal installieren, aktivieren und wieder deaktivieren. Prüfen, dass keine Starclock-Jobs und keine offenen eigenen MailPoet-Queues verbleiben. Erst dann den geprüften Quellstand und das Paket veröffentlichen. GitHub Actions bleibt deaktiviert.
+
+## Linux-Stage ohne Kundendaten
+
+Auf Linux verweigert der Testprozess über systemd-run mit
+RestrictAddressFamilies=AF_UNIX und IPAddressDeny=any alle Internet-Sockets.
+NoNewPrivileges=yes bleibt gesetzt. Der PHP-Aufruf deaktiviert mail, exec,
+shell_exec, system, passthru, proc_open und popen. Nur der private Unix-Socket
+der getrennten Datenbank ist erreichbar.
+
+Dafür ist die PHP-Sockets-Erweiterung erforderlich: tests/isolation.php muss
+sowohl IPv4 als auch IPv6 als vom Betriebssystem verweigert feststellen. Ohne
+Sperre muss derselbe Guard abbrechen. Ein fehlgeschlagener HTTP-Aufruf oder
+ein Timeout genügt nicht. Alle fünf zustandsändernden Testprogramme verwenden
+diesen gemeinsamen Guard; keine Prüfung auf einer Kundenkopie ausführen.

@@ -24,3 +24,27 @@ Die WordPress-Mitteilung über eine überfällige Action-Scheduler-Aufgabe stamm
 Nach den Tests: keine aktiven Starclock-Pläne, keine offenen eigenen Übergaben, kein Starclock-Cron und keine MailPoet-Versandstatistik. Testkonstante entfernt, UI-Plugin deaktiviert und die eigenen Testprozesse gestoppt. Die synthetischen Daten und Nachweise bleiben für Reproduktion lokal erhalten.
 
 Nicht nachgewiesen sind SMTP-Zustellung, ein produktiver Hoster-Cron und die fachliche Freigabe einer echten Vorlage samt Empfängern. Es wurde keine Kundenautomatik installiert oder aktiviert. Die deklarierte Mindestversion WordPress 6.5 ist noch kein getesteter Matrixeintrag; die tatsächlich getesteten Versionen stehen oben.
+
+## Linux-Stage am 30. Oktober
+
+Ein getrenntes synthetisches WordPress auf dem Stage-Server wurde mit WordPress
+7.0.4, PHP 8.4.27 und MailPoet 5.44.0 geprüft: 24 Zeitprüfungen, 28 Integrationsprüfungen,
+5 Prüfungen zum verlorenen Übergabebeleg und 4 Rechte-/Nonce-Prüfungen bestanden.
+Acht parallele vollständige Ticks erzeugten genau eine Kampagne; acht parallele
+Reservierungen genau einen Gewinner. Zweimalige Aktivierung und Deaktivierung
+des unveränderten ZIP 0.1.0 bestanden.
+
+Linux verweigert IPv4- und IPv6-Sockets mit Fehler 97. fsockopen gab unter dieser
+Sperre jedoch Fehler 0 zurück; der bisherige macOS-spezifische Nachweis über Fehler 1
+war deshalb nicht portabel. Der gemeinsame Test-Guard prüft auf Linux beide
+Socket-Familien direkt. Er wurde ohne Sperre abgewiesen und mit Sperre akzeptiert;
+die vorhandene macOS-Sandbox besteht weiterhin. Ein Timeout allein wird nicht als
+Nachweis der Netzwerksperre akzeptiert. Der Test-Guard steht ab Commit 767d540;
+der installierte Plugin-Code bleibt Release 0.1.0.
+
+Die Datenbank war neu, ausschließlich synthetisch und nur über ihren privaten
+Unix-Socket erreichbar. PHP-Mail, externe Netzwerkverbindungen, WordPress-HTTP
+und asynchrone Action-Scheduler-Aufrufe waren gesperrt. Kein öffentlicher
+Test-Endpunkt wurde angelegt. Nach Abschluss: null aktive Pläne, offene Übergaben,
+Starclock-Cronereignisse oder Versandstatistik; Plugin im Testsystem deaktiviert
+und privater Datenbankprozess gestoppt. Keine SMTP-Zustellung geprüft.
