@@ -48,3 +48,37 @@ und asynchrone Action-Scheduler-Aufrufe waren gesperrt. Kein öffentlicher
 Test-Endpunkt wurde angelegt. Nach Abschluss: null aktive Pläne, offene Übergaben,
 Starclock-Cronereignisse oder Versandstatistik; Plugin im Testsystem deaktiviert
 und privater Datenbankprozess gestoppt. Keine SMTP-Zustellung geprüft.
+
+## Begrenzter Live-Test am 30. Oktober
+
+Release 0.1.1 wurde auf WordPress 7.1.4, PHP 8.3.36 und MailPoet 5.44.0
+installiert; alle 16 Paketdateien entsprechen dem Release-Manifest. Gegenüber
+0.1.0 änderten sich Lizenz und Dokumentation, nicht der Scheduler.
+
+Eine ausdrücklich erlaubte interne Empfangsprobe verwendete ausschließlich
+eine kontrollierte Testadresse. Eine zusätzliche, installationsbezogene Sperre
+prüfte Plan, Ablaufzeit und exakten Empfänger vor dem Batch und vor SMTP.
+Cc/Bcc waren ausgeschlossen; eine atomare Reservierung erlaubte genau einen
+Transportversuch. Der Produktivplan blieb ausgeschaltet und zusätzlich gesperrt.
+
+WordPress-Cron löste den Test rund zwei Minuten nach dem geplanten Termin aus.
+Starclock erzeugte genau einen Lauf, eine MailPoet-Kopie und einen Queue-Beleg.
+Ein weiterer gezielter Tick erzeugte keine zweite Kampagne. Der SMTP-Beleg und
+die tatsächlich empfangene Nachricht besitzen dieselbe Message-ID. Der Eingang
+lag im Posteingang, nicht im Spam; SPF, DKIM und DMARC bestanden. Abgemeldete
+und unbestätigte Testkontakte wurden nicht beliefert.
+
+Personalisierung, HTML-/Textfassungen und Abmeldemöglichkeit wurden am Empfang
+geprüft. Die MailPoet-Webansicht hatte bei 390 CSS-Pixeln keinen seitlichen
+Überlauf; dies ist kein mobiler Mailclient-Test. Private Mailinhalte, Adressen,
+Kontodaten und Screenshots bleiben außerhalb dieser öffentlichen Repo.
+
+Nach Abschluss: Testfreigabe geschlossen, Testplan pausiert, kein aktiver Plan,
+keine offene eigene Queue und kein Starclock-Cron. Testkontakte, -liste und
+-kampagnen wurden wiederherstellbar entfernt; Lauf- und Transportbelege bleiben.
+Der reguläre Versand wurde nicht aktiviert.
+
+Dieser Test belegt die einmalige native Auslösung und Zustellung auf der
+geprüften Kombination. Er belegt weder einen unabhängigen Hoster-Zeitgeber
+noch zukünftige Zustellung an jeden Empfänger. Beides ist bei jeder Installation
+gesondert zu prüfen; ein erfolgreicher Test aktiviert keine Kundenautomatik.
