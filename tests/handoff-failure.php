@@ -1,14 +1,8 @@
 <?php
 declare(strict_types=1);
 
-if (!defined('DB_NAME') || !str_starts_with(DB_NAME, 'starclock_test_') || WP_HOME !== 'http://starclock-test.invalid'
-    || wp_get_environment_type() !== 'local' || function_exists('mail')) {
-    throw new RuntimeException('Isolated synthetic runtime required.');
-}
-$socket = @fsockopen('tcp://1.1.1.1', 443, $errno, $message, 1);
-if ($socket || $errno !== 1) {
-    throw new RuntimeException('OS transport block required.');
-}
+require_once __DIR__ . '/isolation.php';
+starclock_require_isolation();
 require_once __DIR__ . '/../src/load.php';
 
 final class LostReceipt implements Starclock\Adapter

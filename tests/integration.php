@@ -1,17 +1,8 @@
 <?php
 declare(strict_types=1);
 
-if (!defined('DB_NAME') || !str_starts_with(DB_NAME, 'starclock_test_') || wp_get_environment_type() !== 'local'
-    || !defined('WP_HOME') || WP_HOME !== 'http://starclock-test.invalid' || function_exists('mail')) {
-    throw new RuntimeException('This test requires an isolated synthetic WordPress database and blocked transport.');
-}
-$probe = @fsockopen('tcp://1.1.1.1', 443, $errno, $message, 1);
-if ($probe || $errno !== 1) {
-    if ($probe) {
-        fclose($probe);
-    }
-    throw new RuntimeException('OS network denial is required.');
-}
+require_once __DIR__ . '/isolation.php';
+starclock_require_isolation();
 require_once __DIR__ . '/../src/load.php';
 
 use Starclock\{Store, Engine, MailPoetAdapter, Admin};
