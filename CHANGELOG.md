@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.1.1 · 30.10.2026
+
+- Eigener Plugin-Code unter MIT; keine Lizenzschlüssel oder Lizenzkosten.
+- Unveränderter Scheduler und MailPoet-Adapter gegenüber 0.1.0.
+
 ## 0.1.0 · 29.10.2026
 
 - Wochenpläne mit Zeitzone, Startdatum, begrenztem Versandfenster und einzelnen ausgelassenen Terminen.

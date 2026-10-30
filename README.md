@@ -2,11 +2,13 @@
 
 Wiederkehrende E-Mails in WordPress planen. MailPoet verwaltet Inhalt, Listen, Abmeldungen und Versand. Starclock ergänzt Wochenplan, Pause und nachvollziehbare Übergaben.
 
-Version 0.1.0. Neue Pläne sind ausgeschaltet. Die Installation aktiviert keinen Versand und richtet keinen Server-Cron ein.
+Version 0.1.1. Neue Pläne sind ausgeschaltet. Die Installation aktiviert keinen Versand und richtet keinen Server-Cron ein.
+
+Open Source unter der [MIT-Lizenz](LICENSE). Keine Lizenzkosten, Lizenzschlüssel oder Aktivierung. Der Copyright- und Lizenzhinweis bleibt bei Weitergabe erhalten. WordPress und MailPoet behalten ihre eigenen Lizenzen und werden nicht mitgeliefert.
 
 ## Einrichten
 
-1. Das Paket `starclock-0.1.0.zip` unter **Plugins → Installieren → Plugin hochladen** installieren und aktivieren.
+1. Das Paket `starclock-0.1.1.zip` unter **Plugins → Installieren → Plugin hochladen** installieren und aktivieren.
 2. In MailPoet einen Standard-Newsletter als Entwurf anlegen. Betreff, Listen, Absender, Antwortadresse und Abmeldelink ergänzen. Diesen Entwurf als Vorlage behalten.
 3. Unter **Starclock → Neuer Zeitplan** die Vorlage und den wöchentlichen Termin wählen. Zeitzone, Startdatum und Versandfenster kontrollieren. **Pausiert speichern**.
 4. **Vorlage und Zeitplan prüfen** wählen. Die angezeigten Empfänger und Absender kontrollieren; den Inhalt in MailPoet prüfen.
