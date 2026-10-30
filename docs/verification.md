@@ -86,3 +86,18 @@ This test proves one native trigger and delivery on the tested combination.
 It does not prove an independent hosting-provider trigger or future delivery
 to every recipient. Each installation needs separate checks for both.
 A successful test does not enable customer automation.
+
+## Independent host trigger check on 30 October 2026
+
+The hosting control panel accepted a one-minute HTTPS job. The provider called
+a short-lived probe at 18:16:01 UTC without a page visit or manual GET request.
+The probe wrote one receipt without loading WordPress, MailPoet, or any mail
+transport. Twelve local checks covered invalid requests, expiry, and duplicate
+calls. A HEAD request to the deployed probe returned 405 as expected.
+
+The job was disabled before its target was changed to WordPress-Cron. The saved
+job remains disabled, without an output-email address. This verifies the
+provider's independent HTTP trigger separately from the delivery test above.
+It does not prove a full host-to-mail run. Activating the WordPress target also
+allows other due WordPress tasks to run and needs its own controlled release.
+The production schedule and delivery guard remain closed.
