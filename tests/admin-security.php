@@ -17,6 +17,17 @@ $denyMailPoet = static function (array $capabilities): array {
 add_filter('user_has_cap', $denyMailPoet);
 $checks['MailPoet permission is required separately'] = !Starclock\Admin::authorized();
 remove_filter('user_has_cap', $denyMailPoet);
+$tickBefore = get_option('starclock_last_tick');
+$errorBefore = get_option('starclock_tick_error');
+$_GET = [];
+ob_start();
+$admin->page();
+$html = ob_get_clean();
+$checks['Admin has no clock health section'] = !str_contains($html, 'sc-health') && !str_contains($html, 'WordPress-Takt');
+$checks['Admin retains schedule controls'] = str_contains($html, 'Neuer Zeitplan') && str_contains($html, 'name="_wpnonce"')
+    && str_contains($html, 'name="operation"');
+$checks['Rendering leaves operational evidence unchanged'] = get_option('starclock_last_tick') === $tickBefore
+    && get_option('starclock_tick_error') === $errorBefore;
 add_filter('wp_die_handler', static fn() => static function ($message, $title, $args): never {
     throw new RuntimeException((string)($args['response'] ?? 500));
 });

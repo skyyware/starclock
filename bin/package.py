@@ -26,6 +26,7 @@ with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as archive:
         entry.compress_type = zipfile.ZIP_DEFLATED
         archive.writestr(entry, source.read_bytes())
 manifest = {'version': version, 'sha256': hashlib.sha256(target.read_bytes()).hexdigest(),
-            'files': [str(p.relative_to(root)) for p in files]}
+            'files': [str(p.relative_to(root)) for p in files],
+            'file_sha256': {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}}
 (out / f'starclock-{version}.json').write_text(json.dumps(manifest, indent=2) + '\n')
 print(json.dumps({'package': str(target), **manifest}, indent=2))

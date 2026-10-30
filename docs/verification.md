@@ -1,5 +1,25 @@
 # Verification results
 
+## Release 0.1.2 on 30 October 2026
+
+The candidate ZIP passed the following exact combinations in fresh synthetic installations on macOS:
+
+| WordPress | PHP | MailPoet | Result |
+| --- | --- | --- | --- |
+| 7.1.4 | 8.3.36 | 5.44.0 | Passed |
+| 7.0.4 | 8.4.27 | 5.35.1 | Passed |
+| 7.0.4 | 8.4.27 | 5.39.0 | Passed |
+
+Each case passed 75 named assertions across scheduling, integration, lost receipts, admin security, markup, concurrent ticks, retained internal tick evidence, inactive MailPoet, and closeout. Eight simultaneous reservations produced one winner and seven rejected duplicates. Eight full ticks produced exactly one native MailPoet campaign. The WordPress-Takt section is absent with active and inactive MailPoet; schedule controls remain. Rendering does not change diagnostic options.
+
+Every PHP test process ran under an OS network denial with PHP mail and process-execution functions disabled. WordPress HTTP, WordPress mail, and asynchronous Action Scheduler requests were blocked. All contacts were synthetic. Final checks found no active schedules, pending owned handoffs, Starclock cron events, or newsletter send statistics.
+
+`tests/matrix.json` defines the required combinations. `bin/verify.py` runs packaged code, saves exact runtime versions, and binds evidence to ZIP and test-suite hashes. `bin/release_check.py` rejects missing, failed, or stale evidence. Five gate tests cover valid evidence and negative cases, including changed versions, hashes, missing checks, incomplete closeout, and duplicate reservations.
+
+Running two matrix cases at once on one database server exposed shared named-lock contention between databases with the same table prefix. Sequential cases pass; within-site concurrency remains tested. The scheduler lock implementation is unchanged. This is an operational limit, not evidence of duplicate sending.
+
+No customer installation, real recipient, hosting schedule, or delivery setting was changed by these product tests. The private owner record tracks demo installation and any access or security exception separately. PHP and WordPress minimum versions are not newly certified by this matrix. SMTP delivery and Linux execution of 0.1.2 remain outside these checks.
+
 ## Isolated tests on 29 October 2026
 
 Starclock 0.1.0 was tested exclusively with synthetic contacts. Outbound networking was blocked by the operating system, and PHP mail was disabled. An additional recipient filter stopped every message before transport.

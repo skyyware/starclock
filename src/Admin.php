@@ -24,7 +24,7 @@ final class Admin
         add_action('admin_post_starclock', [$this, 'submit']);
         add_action('admin_enqueue_scripts', function (string $hook): void {
             if ($hook === 'toplevel_page_starclock') {
-                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.1.0');
+                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.1.2');
             }
         });
     }
@@ -105,7 +105,6 @@ final class Admin
                 }
                 echo '</div>';
             }
-            $this->health($plans);
         } catch (Throwable $error) {
             echo '<div class="notice notice-error"><p>' . esc_html($error->getMessage()) . '</p></div>';
         }
@@ -226,22 +225,4 @@ final class Admin
         echo '</ul><p class="sc-help">„An MailPoet übergeben“ bestätigt die Übergabe, nicht die Zustellung. Versanddetails stehen in MailPoet.</p></section>';
     }
 
-    private function health(array $plans): void
-    {
-        $active = array_filter($plans, static fn(array $plan): bool => $plan['status'] === 'active');
-        $last = (int)get_option('starclock_last_tick', 0);
-        echo '<section class="sc-health"><h2>WordPress-Takt</h2><p>';
-        echo $last ? 'Zuletzt ausgeführt: ' . esc_html(wp_date('d.m.Y · H:i', $last)) : 'Noch kein automatischer Lauf.';
-        echo '</p><p>WordPress-Cron läuft normalerweise bei Seitenaufrufen. Für verlässliche Uhrzeiten sollte der Hoster WordPress-Cron jede Minute ausführen. Starclock richtet keinen Server-Cron ein.</p>';
-        if ($active && (!$last || time() - $last > 600)) {
-            echo '<p class="sc-warning">Der regelmäßige Takt ist noch nicht bestätigt. Bitte den Hoster-Takt vor dem ersten Versand prüfen.</p>';
-        }
-        if ($error = get_option('starclock_tick_error')) {
-            echo '<p class="sc-warning">' . esc_html((string)$error) . '</p>';
-        }
-        if (wp_get_environment_type() !== 'production') {
-            echo '<p>Testumgebung: ' . esc_html(wp_get_environment_type()) . '. Die normale Aktivierung bleibt hier gesperrt.</p>';
-        }
-        echo '</section>';
-    }
 }

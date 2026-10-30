@@ -1,0 +1,5 @@
+{
+  "current": {"wordpress": "7.1.4", "php": "8.3.36", "mailpoet": "5.44.0"},
+  "previous": {"wordpress": "7.0.4", "php": "8.4.27", "mailpoet": "5.35.1"},
+  "regression": {"wordpress": "7.0.4", "php": "8.4.27", "mailpoet": "5.39.0"}
+}

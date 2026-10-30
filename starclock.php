@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Starclock
  * Description: Wiederkehrende WordPress-Zeitpläne mit geprüfter MailPoet-Anbindung.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * Author: SKYYWARE

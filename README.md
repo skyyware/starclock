@@ -2,7 +2,7 @@
 
 Schedule recurring emails in WordPress. MailPoet manages content, mailing lists, unsubscribes, and delivery. Starclock adds weekly schedules, pause controls, and a record of each handoff.
 
-Version 0.1.1. New schedules are disabled. Installation does not enable sending or create a server cron job.
+Version 0.1.2. New schedules are disabled. Installation does not enable sending or create a server cron job.
 
 Open source under the [MIT license](LICENSE). No license fees, license keys, or license activation. Retain the copyright and license notice when redistributing the plugin. WordPress and MailPoet retain their own licenses and are not bundled.
 
@@ -10,7 +10,7 @@ Open source under the [MIT license](LICENSE). No license fees, license keys, or 
 
 The current Starclock admin uses German labels. The steps below retain those labels so you can find each control.
 
-1. Install and activate `starclock-0.1.1.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
+1. Install and activate `starclock-0.1.2.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
 2. Create a standard newsletter draft in MailPoet. Set its subject, lists, sender, reply-to address, and unsubscribe link. Keep this draft as the template.
 3. Under **Starclock → Neuer Zeitplan** (new schedule), select the template and weekly time. Check the time zone, start date, and sending window. Select **Pausiert speichern** (save paused).
 4. Select **Vorlage und Zeitplan prüfen** (check template and schedule). Check the displayed recipients and sender. Review the content in MailPoet.
@@ -28,7 +28,7 @@ Changes to the template, sender, or lists require a new check. Starclock does no
 - The MailPoet adapter accepts only verified versions. Handoffs remain blocked on other versions. The allowed version range never expands automatically.
 - Weekly schedules use an IANA time zone such as `Europe/Berlin`. A time skipped by a daylight-saving transition is omitted. A repeated time runs once, at its first occurrence.
 - The sending window limits late handoffs and pending recipients. It ends no later than midnight. Missed days are not retried.
-- Without an external trigger, WordPress-Cron depends on page visits. The status display shows the last Starclock tick. The site operator must configure the hosting provider's trigger. See the [WordPress cron documentation](https://developer.wordpress.org/plugins/cron/).
+- Without an external trigger, WordPress-Cron depends on page visits. The operator must configure and verify the hosting provider's trigger. The internal options `starclock_last_tick` and `starclock_tick_error` retain diagnostic evidence. They are not shown in the schedule admin. See the [WordPress cron documentation](https://developer.wordpress.org/plugins/cron/).
 - A changed website host or a non-production environment blocks execution. Before cloning a site, also isolate MailPoet and the mail transport.
 - Changes require site-management and MailPoet email-management permissions, a valid WordPress nonce, and the current edit revision.
 - Starclock stores schedules, template metadata, and run receipts in the site's WordPress database. It does not copy recipient lists or collect telemetry.
