@@ -1,40 +1,42 @@
 # Starclock
 
-Wiederkehrende E-Mails in WordPress planen. MailPoet verwaltet Inhalt, Listen, Abmeldungen und Versand. Starclock ergänzt Wochenplan, Pause und nachvollziehbare Übergaben.
+Schedule recurring emails in WordPress. MailPoet manages content, mailing lists, unsubscribes, and delivery. Starclock adds weekly schedules, pause controls, and a record of each handoff.
 
-Version 0.1.1. Neue Pläne sind ausgeschaltet. Die Installation aktiviert keinen Versand und richtet keinen Server-Cron ein.
+Version 0.1.1. New schedules are disabled. Installation does not enable sending or create a server cron job.
 
-Open Source unter der [MIT-Lizenz](LICENSE). Keine Lizenzkosten, Lizenzschlüssel oder Aktivierung. Der Copyright- und Lizenzhinweis bleibt bei Weitergabe erhalten. WordPress und MailPoet behalten ihre eigenen Lizenzen und werden nicht mitgeliefert.
+Open source under the [MIT license](LICENSE). No license fees, license keys, or license activation. Retain the copyright and license notice when redistributing the plugin. WordPress and MailPoet retain their own licenses and are not bundled.
 
-## Einrichten
+## Set up a schedule
 
-1. Das Paket `starclock-0.1.1.zip` unter **Plugins → Installieren → Plugin hochladen** installieren und aktivieren.
-2. In MailPoet einen Standard-Newsletter als Entwurf anlegen. Betreff, Listen, Absender, Antwortadresse und Abmeldelink ergänzen. Diesen Entwurf als Vorlage behalten.
-3. Unter **Starclock → Neuer Zeitplan** die Vorlage und den wöchentlichen Termin wählen. Zeitzone, Startdatum und Versandfenster kontrollieren. **Pausiert speichern**.
-4. **Vorlage und Zeitplan prüfen** wählen. Die angezeigten Empfänger und Absender kontrollieren; den Inhalt in MailPoet prüfen.
-5. Den WordPress-Takt beim Hoster prüfen. Für zuverlässige Termine muss der Hoster WordPress-Cron regelmäßig ausführen. Danach **Automatik aktivieren** wählen.
+The current Starclock admin uses German labels. The steps below retain those labels so you can find each control.
 
-Die Automatik beginnt beim nächsten Termin. Bei jedem Lauf entsteht eine eigene Standardkampagne in MailPoet. Die Vorlage bleibt unverändert. Neue bestätigte Kontakte der gewählten Listen werden berücksichtigt; abgemeldete Kontakte werden durch MailPoet ausgeschlossen.
+1. Install and activate `starclock-0.1.1.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
+2. Create a standard newsletter draft in MailPoet. Set its subject, lists, sender, reply-to address, and unsubscribe link. Keep this draft as the template.
+3. Under **Starclock → Neuer Zeitplan** (new schedule), select the template and weekly time. Check the time zone, start date, and sending window. Select **Pausiert speichern** (save paused).
+4. Select **Vorlage und Zeitplan prüfen** (check template and schedule). Check the displayed recipients and sender. Review the content in MailPoet.
+5. Verify that your hosting provider runs WordPress-Cron regularly, independently of page visits. Then select **Automatik aktivieren** (enable automatic sending).
 
-**Pausieren** stoppt kommende Läufe und pausiert noch offene eigene MailPoet-Kampagnen. Ein bereits laufender Versand kann noch Empfänger erreichen; versandte E-Mails werden nicht zurückgerufen. **Nächsten Lauf auslassen** überspringt genau einen Termin.
+Automatic sending starts at the next scheduled occurrence. Each run creates a separate standard campaign in MailPoet and leaves the template unchanged. New confirmed subscribers to the selected lists are included. MailPoet excludes unsubscribed contacts.
 
-Änderungen an Vorlage, Absender oder Listen erfordern eine neue Prüfung. Ein Fehler bei der Übergabe wird nicht automatisch wiederholt. Den Status zuerst in MailPoet prüfen, dann den unterbrochenen Lauf in Starclock schließen. Der reservierte Termin bleibt gesperrt; der folgende Termin kann wieder aktiviert werden.
+**Pausieren** (pause) stops future runs and pauses pending MailPoet campaigns owned by Starclock. A send already in progress may still reach recipients. Sent emails cannot be recalled. **Nächsten Lauf auslassen** (skip next run) skips exactly one occurrence.
 
-## Betrieb
+Changes to the template, sender, or lists require a new check. Starclock does not automatically retry a failed handoff. Check the status in MailPoet first, then close the interrupted run in Starclock. The reserved occurrence remains blocked. You can enable the following occurrence.
 
-- PHP ab 8.1, WordPress ab 6.5. Einzelne Websites in Multisite sind möglich; Netzwerkaktivierung ist gesperrt.
-- Der MailPoet-Adapter erlaubt nur nachgewiesene Versionen. Bei einer anderen Version bleiben Übergaben gesperrt. Keine automatische Erweiterung des Versionsbereichs.
-- Der Wochenplan verwendet eine IANA-Zeitzone wie `Europe/Berlin`. In der Zeitumstellung entfällt eine nicht existierende Uhrzeit. Eine doppelte Uhrzeit wird beim ersten Auftreten einmal verwendet.
-- Das Versandfenster begrenzt verspätete Übergaben und offene Restmengen. Es endet spätestens um Mitternacht. Verpasste Tage werden nicht nachgeholt.
-- WordPress-Cron hängt ohne externen Takt von Seitenaufrufen ab. Die Statusanzeige zeigt den letzten Starclock-Aufruf. Die Einrichtung des Host-Takts bleibt beim Betreiber. [WordPress-Dokumentation](https://developer.wordpress.org/plugins/cron/)
-- Ein geänderter Website-Host oder eine Nicht-Produktionsumgebung sperrt die Ausführung. Vor dem Klonen einer Website zusätzlich MailPoet und den Mailtransport isolieren.
-- Rechte: Website-Verwaltung und MailPoet-E-Mail-Verwaltung. Änderungen benötigen einen gültigen WordPress-Nonce und den aktuellen Bearbeitungsstand.
-- Starclock speichert Pläne, Vorlagen-Metadaten und Laufbelege in der eigenen WordPress-Datenbank. Es kopiert keine Empfängerlisten und hat keine Telemetrie.
+## Operation
 
-## Wartung
+- Requires PHP 8.1 or later and WordPress 6.5 or later. Individual sites in a multisite installation are supported. Network activation is blocked.
+- The MailPoet adapter accepts only verified versions. Handoffs remain blocked on other versions. The allowed version range never expands automatically.
+- Weekly schedules use an IANA time zone such as `Europe/Berlin`. A time skipped by a daylight-saving transition is omitted. A repeated time runs once, at its first occurrence.
+- The sending window limits late handoffs and pending recipients. It ends no later than midnight. Missed days are not retried.
+- Without an external trigger, WordPress-Cron depends on page visits. The status display shows the last Starclock tick. The site operator must configure the hosting provider's trigger. See the [WordPress cron documentation](https://developer.wordpress.org/plugins/cron/).
+- A changed website host or a non-production environment blocks execution. Before cloning a site, also isolate MailPoet and the mail transport.
+- Changes require site-management and MailPoet email-management permissions, a valid WordPress nonce, and the current edit revision.
+- Starclock stores schedules, template metadata, and run receipts in the site's WordPress database. It does not copy recipient lists or collect telemetry.
 
-Ein Update wird als geprüftes ZIP manuell installiert. Keine Fernsteuerung und kein automatischer GitHub-Updater. Beim Deaktivieren werden eigene offene MailPoet-Kampagnen zuerst pausiert. Schlägt das fehl, verhindert Starclock die Deaktivierung, damit der Schutz vor verspätetem Versand erhalten bleibt.
+## Maintenance
 
-Pläne und Laufbelege bleiben beim Deaktivieren oder Löschen erhalten. Sie verhindern doppelte Übergaben nach einer Neuinstallation. Datenbankänderungen vor einem Downgrade prüfen; ein Code-Rollback allein stellt keine Daten wieder her.
+Install updates manually from a verified ZIP. There is no remote control or automatic GitHub updater. Deactivation first pauses pending MailPoet campaigns owned by Starclock. If that fails, Starclock blocks deactivation to preserve the protection against late sending.
 
-[Entwicklung und Tests](docs/development.md) · [Prüfergebnisse](docs/verification.md) · [Adapter-Vertrag](docs/adapters.md) · [Änderungen](CHANGELOG.md)
+Schedules and run receipts survive deactivation and deletion. They prevent duplicate handoffs after reinstallation. Check database changes before downgrading. A code rollback alone does not restore data.
+
+[Development and testing](docs/development.md) · [Verification results](docs/verification.md) · [Adapter contract](docs/adapters.md) · [Changelog](CHANGELOG.md)

@@ -1,56 +1,56 @@
-# Starclock prüfen und paketieren
+# Test and package Starclock
 
-## Lokale Prüfungen
+## Run local checks
 
-PHP 8.1 oder neuer verwenden:
+Use PHP 8.1 or later:
 
 ```sh
 php tests/unit.php
 python3 bin/package.py
 ```
 
-Der Paketierer prüft PHP-Syntax, die Zeittests und die erlaubten Paketdateien. Ausgabe liegt unter `.runtime/dist/`. Das ZIP enthält das Verzeichnis `starclock/` und keine Tests, lokalen Daten oder Entwicklungswerkzeuge.
+The packager checks PHP syntax, scheduling tests, and the allowed package files. Output goes to `.runtime/dist/`. The ZIP contains the `starclock/` directory and excludes tests, local data, and development tools.
 
-## MailPoet-Integration prüfen
+## Test the MailPoet integration
 
-Eine getrennte WordPress-Installation mit ausschließlich künstlichen Kontakten verwenden. Niemals eine Kundenkopie als Testdatenbank verwenden. Der Test verlangt:
+Use a separate WordPress installation with synthetic contacts only. Never use a customer database copy for testing. The test requires:
 
-- `DB_NAME` beginnt mit `starclock_test_`.
-- `WP_HOME` ist `http://starclock-test.invalid`.
-- `WP_ENVIRONMENT_TYPE` ist `local`, `DISABLE_WP_CRON` ist `true`.
-- Die PHP-Funktion `mail` ist deaktiviert. Das Betriebssystem verweigert ausgehende Netzwerkverbindungen; nur der private Unix-Datenbanksocket ist erreichbar.
-- Ein MU-Guard blockiert WordPress-HTTP, `wp_mail` und den asynchronen Action-Scheduler.
+- `DB_NAME` starts with `starclock_test_`.
+- `WP_HOME` is `http://starclock-test.invalid`.
+- `WP_ENVIRONMENT_TYPE` is `local`, and `DISABLE_WP_CRON` is `true`.
+- The PHP `mail` function is disabled. The operating system blocks outbound network connections. Only the private Unix database socket is reachable.
+- A must-use guard blocks WordPress HTTP requests, `wp_mail`, and the asynchronous Action Scheduler runner.
 
-MailPoet aktivieren und die passende Version bereitstellen. Über den isolierten PHP-Aufruf ausführen:
+Install and activate the MailPoet version you want to test. Run the following command through the isolated PHP process:
 
 ```sh
 php /path/to/wp-cli.phar --path=/path/to/synthetic-wordpress eval 'require "/path/to/starclock/tests/integration.php";'
 ```
 
-`eval-file` verwenden wir nicht: WP-CLI stellt der Datei Code voran und verletzt damit `strict_types`. `eval` lädt die Datei über `require`, sodass PHP sie normal prüft.
+Do not use `eval-file`. WP-CLI prepends code to the file, which breaks `strict_types`. The `eval` command loads the file through `require`, so PHP checks it normally.
 
-Der Test legt eindeutig markierte Listen, Kontakte, Vorlagen und Laufbelege an. Der echte MailPoet-Worker ermittelt Empfänger. Ein nachgeschalteter Testfilter verwirft alle Empfänger vor dem gesperrten Transport. Die Testpläne enden pausiert. Nach dem Test offene eigene Jobs prüfen und den isolierten Datenbankprozess beenden. Nachweise behalten; keine ungezielte Bereinigung.
+The test creates uniquely marked lists, contacts, templates, and run receipts. The real MailPoet worker selects recipients. A subsequent test filter removes all recipients before the blocked transport. Test schedules end paused. After the test, check for pending jobs owned by the test and stop the isolated database process. Keep the evidence. Do not clean up unrelated data.
 
-`tests/handoff-failure.php` erzeugt einen Fehler nach einer tatsächlich angelegten MailPoet-Queue. `tests/admin-security.php` prüft Rechte und Nonces. `tests/concurrency.php` reserviert den über `STARCLOCK_RACE_PLAN` übergebenen synthetischen Plan. `tests/tick-race.php` führt den vollständigen Tick zum kontrollierten Testtermin aus. Parallele Aufrufe ausschließlich im gleichen isolierten Testsystem starten und danach die eigene Kampagne pausieren. Die Betriebssystem-Sperre bleibt dabei aktiv.
+`tests/handoff-failure.php` causes a failure after MailPoet has created a real queue. `tests/admin-security.php` checks permissions and nonces. `tests/concurrency.php` reserves the synthetic schedule specified by `STARCLOCK_RACE_PLAN`. `tests/tick-race.php` runs the full tick at a controlled test time. Run concurrent calls only in the same isolated test system. Afterwards, pause the test campaign. Keep the operating-system transport block active throughout.
 
-Die temporäre Konstante `STARCLOCK_ALLOW_NONPRODUCTION` erlaubt Aktivierung ausschließlich für separat gesicherte Tests. Sie stellt selbst keine Versandsperre her und gehört nicht in ein Kunden-Stage-System.
+The temporary `STARCLOCK_ALLOW_NONPRODUCTION` constant permits activation only for separately protected tests. It does not block sending and must not be used on a customer's staging site.
 
-## Release prüfen
+## Verify a release
 
-Vor einer neuen Version die Zeittests, die echte MailPoet-Integration und konkurrierende Reservierungen prüfen. Den Admin ohne MailPoet, mit ungültigem Formular, als unberechtigter Benutzer und in schmaler Ansicht kontrollieren. Eine erfolgreiche Übergabe ist kein SMTP- oder Zustelltest.
+Before releasing a new version, run the scheduling tests, real MailPoet integration tests, and concurrent reservation tests. Check the admin without MailPoet, with an invalid form, as an unauthorized user, and at a narrow viewport. A successful handoff does not prove SMTP acceptance or receipt.
 
-Versionsnummer, dokumentierte Kompatibilität und Paket zusammen ändern. Ein neues ZIP lokal installieren, aktivieren und wieder deaktivieren. Prüfen, dass keine Starclock-Jobs und keine offenen eigenen MailPoet-Queues verbleiben. Erst dann den geprüften Quellstand und das Paket veröffentlichen. GitHub Actions bleibt deaktiviert.
+Update the version number, documented compatibility, and package together. Install, activate, and deactivate the new ZIP locally. Verify that no Starclock jobs or pending MailPoet queues owned by Starclock remain. Publish the verified source revision and package only after these checks pass. Keep GitHub Actions disabled.
 
-## Linux-Stage ohne Kundendaten
+## Test on Linux staging without customer data
 
-Auf Linux verweigert der Testprozess über systemd-run mit
-RestrictAddressFamilies=AF_UNIX und IPAddressDeny=any alle Internet-Sockets.
-NoNewPrivileges=yes bleibt gesetzt. Der PHP-Aufruf deaktiviert mail, exec,
-shell_exec, system, passthru, proc_open und popen. Nur der private Unix-Socket
-der getrennten Datenbank ist erreichbar.
+On Linux, run the test process through `systemd-run` with
+`RestrictAddressFamilies=AF_UNIX` and `IPAddressDeny=any` to block all Internet
+sockets. Keep `NoNewPrivileges=yes` set. Disable `mail`, `exec`, `shell_exec`,
+`system`, `passthru`, `proc_open`, and `popen` in the PHP process. Only the
+separate database's private Unix socket is reachable.
 
-Dafür ist die PHP-Sockets-Erweiterung erforderlich: tests/isolation.php muss
-sowohl IPv4 als auch IPv6 als vom Betriebssystem verweigert feststellen. Ohne
-Sperre muss derselbe Guard abbrechen. Ein fehlgeschlagener HTTP-Aufruf oder
-ein Timeout genügt nicht. Alle fünf zustandsändernden Testprogramme verwenden
-diesen gemeinsamen Guard; keine Prüfung auf einer Kundenkopie ausführen.
+The PHP sockets extension is required. `tests/isolation.php` must confirm that
+the operating system denies both IPv4 and IPv6. The same guard must reject a
+run without that block. A failed HTTP request or a timeout is not sufficient.
+All five state-changing test programs use this shared guard. Never run them
+against a customer database copy.

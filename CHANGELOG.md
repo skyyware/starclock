@@ -1,14 +1,14 @@
-# Änderungen
+# Changelog
 
-## 0.1.1 · 30.10.2026
+## 0.1.1 · 2026-10-30
 
-- Eigener Plugin-Code unter MIT; keine Lizenzschlüssel oder Lizenzkosten.
-- Unveränderter Scheduler und MailPoet-Adapter gegenüber 0.1.0.
+- Licensed the plugin's own code under MIT. No license keys or license fees.
+- Scheduler and MailPoet adapter unchanged from 0.1.0.
 
-## 0.1.0 · 29.10.2026
+## 0.1.0 · 2026-10-29
 
-- Wochenpläne mit Zeitzone, Startdatum, begrenztem Versandfenster und einzelnen ausgelassenen Terminen.
-- Getrennte Schritte für Speichern, Prüfen und Aktivieren; Übersicht mit nächstem Termin und Verlauf.
-- MailPoet-Adapter mit Entwurfskopie, bestätigter Queue-Übergabe und Prüfung vor jedem Empfänger-Batch.
-- Atomare Reservierung, Schutz vor veralteten Formularen, Pause nach Vorlagenänderungen und sichtbare Behandlung unterbrochener Läufe.
-- Erweiterung über `Starclock\Adapter`; manuelle Pakete und erhaltene Laufbelege.
+- Weekly schedules with a time zone, start date, bounded sending window, and individual skipped occurrences.
+- Separate save, check, and enable steps. Overview with the next occurrence and run history.
+- MailPoet adapter with draft duplication, confirmed queue handoff, and a check before each recipient batch.
+- Atomic reservations, stale-form protection, a pause after template changes, and visible handling of interrupted runs.
+- Extensions through `Starclock\Adapter`, manual release packages, and retained run receipts.
