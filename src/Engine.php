@@ -54,6 +54,11 @@ final class Engine
             if ($id) {
                 $old = $this->store->plan($id);
                 $this->assertRevision($old, $revision);
+                $this->assertEditable($old);
+                $old['status'] = 'paused';
+                $old['approved'] = null;
+                $old = $this->store->save($old, $revision);
+                $revision = $old['revision'];
                 $this->stopPending($old);
             }
             return $this->store->save($schedule + ['id' => $id, 'title' => $title, 'adapter' => $key,
@@ -69,11 +74,57 @@ final class Engine
         }
     }
 
+    private function assertEditable(array $plan): void
+    {
+        if (in_array($plan['status'], ['archived', 'deleted'], true)) {
+            throw new RuntimeException('Archivierte Zeitpläne zuerst wiederherstellen. Gelöschte Zeitpläne bleiben gelöscht.');
+        }
+    }
+
     public function action(int $id, int $revision, string $action, DateTimeImmutable $now): array
     {
         return $this->store->locked('plans', function () use ($id, $revision, $action, $now): array {
             $plan = $this->store->plan($id);
             $this->assertRevision($plan, $revision);
+            if ($plan['status'] === 'deleted') {
+                throw new RuntimeException('Dieser Zeitplan ist gelöscht. Nur seine Nachweise bleiben erhalten.');
+            }
+            if ($action === 'restore') {
+                if ($plan['status'] !== 'archived') {
+                    throw new RuntimeException('Nur archivierte Zeitpläne können wiederhergestellt werden.');
+                }
+                $plan['status'] = 'paused';
+                $plan['approved'] = null;
+                $plan['not_before'] = 0;
+                unset($plan['archived_at']);
+                $plan['notice'] = 'Pausiert wiederhergestellt. Vor einem Versand erneut prüfen und aktivieren.';
+                return $this->store->save($plan, $revision);
+            }
+            if ($action === 'archive' || $action === 'delete') {
+                if ($action === 'delete' && !in_array($plan['status'], ['paused', 'archived'], true)) {
+                    throw new RuntimeException('Den Zeitplan vor dem Löschen pausieren oder archivieren.');
+                }
+                if ($action === 'archive') {
+                    $this->assertEditable($plan);
+                    $plan['status'] = 'paused';
+                    $plan['approved'] = null;
+                    $plan['notice'] = 'Gestoppt. Archivierung noch nicht abgeschlossen; offene Läufe prüfen und erneut versuchen.';
+                    $plan = $this->store->save($plan, $revision);
+                }
+                $this->stopPending($plan);
+                if ($this->store->pending($id)) {
+                    throw new RuntimeException('Offene Übergaben zuerst in MailPoet prüfen und mit „Unterbrochene Läufe schließen“ abschließen.');
+                }
+                if ($action === 'delete') {
+                    return $this->store->save(['id' => $id, 'status' => 'deleted', 'title' => $plan['title'],
+                        'adapter' => $plan['adapter'], 'site' => $plan['site'], 'deleted_at' => $now->getTimestamp()], $plan['revision']);
+                }
+                $plan['status'] = 'archived';
+                $plan['archived_at'] = $now->getTimestamp();
+                $plan['notice'] = 'Archiviert. Es werden keine weiteren Läufe gestartet.';
+                return $this->store->save($plan, $plan['revision']);
+            }
+            $this->assertEditable($plan);
             if ($action === 'resolve') {
                 $plan['status'] = 'paused';
                 $plan['approved'] = null;
@@ -276,6 +327,9 @@ final class Engine
     {
         $this->store->locked('plans', function (): void {
             foreach ($this->store->plans() as $plan) {
+                if (in_array($plan['status'], ['archived', 'deleted'], true)) {
+                    continue;
+                }
                 $plan['status'] = 'paused';
                 $plan['approved'] = null;
                 $plan['notice'] = 'Starclock wurde deaktiviert. Vor dem nächsten Start erneut prüfen.';

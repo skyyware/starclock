@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 · 2026-10-31
+
+- Added archive, paused restoration, and confirmed deletion with separate admin views.
+- Retained run receipts and campaign ownership after deletion. MailPoet templates, campaigns, lists, and contacts remain untouched.
+- Blocked archive and delete completion while MailPoet processes an owned batch or a handoff remains unresolved.
+- Added fresh worker-state checks, lifecycle and admin tests, and concurrent archive/tick coverage.
+- Preserved archived and deleted states during deactivation. Older plugin versions cannot safely read these new states.
+
 ## 0.1.2 · 2026-10-30
 
 - Removed the WordPress-Takt admin section. Internal tick, error, and run records remain unchanged.

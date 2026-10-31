@@ -1,5 +1,17 @@
 # Verification results
 
+## Release 0.2.0 on 31 October 2026
+
+The package passed the three combinations in `tests/matrix.json`: WordPress 7.1.4 / PHP 8.3.36 / MailPoet 5.44.0, and WordPress 7.0.4 / PHP 8.4.27 with MailPoet 5.35.1 and 5.39.0. Each case passed 124 named assertions plus the eight-process reservation check. Five release-gate tests passed.
+
+New checks cover archived and deleted plan states, paused restoration, stale revisions, explicit deletion confirmation, permissions, retained receipts, and unchanged MailPoet audience and content counts. Eight competing archive/tick processes settle with at most one handoff, no pending owned queue, and no later execution. A cached idle task cannot hide a provider-side running batch. Archive attempted inside the actual MailPoet worker remains incomplete until that batch ends. A resumed deleted campaign reaches the worker with no permitted recipients.
+
+The maintained local demo passed archive, find-in-archive, paused restoration, delete cancellation, and confirmed deletion. The resulting record is read-only. Native Browser checks covered 1280px desktop and 390px / 320px narrow views without horizontal overflow. MailPoet remained absent, the nonproduction override absent, and the only fixture was a marked plan without recipients or runs. Deactivate/reactivate preserved its deleted state. Private evidence identifies that retained test record and the exact package.
+
+During UI iteration, repeated direct ZIP extraction preserved the normalized archive timestamps. The PHP server continued rendering the preceding confirmation layout despite changed file bytes. Refreshing the installed candidate's file timestamps and reloading exposed the new layout. Direct-extraction updates must refresh the relevant PHP cache or file timestamps and verify the rendered UI, not just disk hashes. WordPress-managed uploads use their own installation path.
+
+All mail integration tests used isolated synthetic databases with OS network denial and disabled PHP mail. Closeout found no active plans, pending owned handoffs, Starclock cron events, or send statistics. Archived/deleted audit records are intentional retained evidence. No customer plan, recipient, Stage installation, Live installation, or sending authorization changed. SMTP receipt and the declared minimum dependency versions are not established by this release's matrix.
+
 ## Release 0.1.2 on 30 October 2026
 
 The candidate ZIP passed the following exact combinations in fresh synthetic installations on macOS:

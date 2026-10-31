@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_CHECKS = {'unit', 'integration', 'handoff-failure', 'admin-security', 'concurrent-ticks',
-                   'concurrent-reservations', 'tick-evidence', 'inactive-mailpoet'}
+                   'concurrent-reservations', 'tick-evidence', 'inactive-mailpoet', 'archive-race', 'lifecycle', 'admin-lifecycle'}
 
 
 def suite_hash():

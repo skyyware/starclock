@@ -6,6 +6,7 @@ namespace Starclock;
 use MailPoet\API\JSON\SuccessResponse;
 use MailPoet\API\JSON\v1\SendingQueue;
 use MailPoet\DI\ContainerWrapper;
+use MailPoet\Newsletter\Sending\ScheduledTasksRepository;
 use MailPoet\Entities\NewsletterEntity;
 use MailPoet\Newsletter\NewsletterSaveController;
 use MailPoet\Newsletter\NewslettersRepository;
@@ -129,13 +130,24 @@ final class MailPoetAdapter implements Adapter
     {
         $mail = $this->mail($copyId);
         $queue = $mail->getLatestQueue();
-        if (!$queue || in_array($queue->getTask()?->getStatus(), ['completed', 'cancelled', 'paused'], true)) {
+        if (!$queue) {
             return;
         }
-        if (!$this->service(SendingQueue::class)->pause(['newsletter_id' => $copyId]) instanceof SuccessResponse) {
+        $task = $queue->getTask();
+        if (!$task) {
+            throw new RuntimeException('Der MailPoet-Versandbeleg fehlt. Starclock aktiviert lassen und den Lauf prüfen.');
+        }
+        $tasks = $this->service(ScheduledTasksRepository::class);
+        $tasks->refresh($task);
+        if (!in_array($task->getStatus(), ['completed', 'cancelled', 'paused'], true)
+            && !$this->service(SendingQueue::class)->pause(['newsletter_id' => $copyId]) instanceof SuccessResponse) {
             throw new RuntimeException('Der offene MailPoet-Lauf konnte nicht pausiert werden. Starclock aktiviert lassen und den Versand in MailPoet prüfen.');
         }
-        if ($this->deliveryState($copyId) !== 'paused') {
+        $tasks->refresh($task);
+        if ($task->getInProgress()) {
+            throw new RuntimeException('MailPoet verarbeitet noch ein Versandpaket. Der Plan ist gestoppt; nach Abschluss erneut versuchen. Bereits übergebene E-Mails lassen sich nicht zurückholen.');
+        }
+        if (!in_array($task->getStatus(), ['completed', 'cancelled', 'paused'], true)) {
             throw new RuntimeException('MailPoet bestätigt die Pause noch nicht. Starclock aktiviert lassen.');
         }
     }

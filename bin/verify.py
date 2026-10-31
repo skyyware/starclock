@@ -80,6 +80,16 @@ try:
         raise RuntimeError(f'Invalid reservation results: {reservations}')
     report['checks']['concurrent-reservations'] = {'winner': 1, 'duplicates': 7}
     script('pause-after-races', 'closeout.php')
+    setup = script('archive-race-setup', 'race-setup.php')
+    env['STARCLOCK_RACE_PLAN'] = str(setup['plan_id'])
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(run, f'archive-race-{index}', wp + ['eval', 'require ' + json.dumps(str(candidate / 'tests' /
+            ('archive-race.php' if index % 2 else 'tick-race.php'))) + ';']) for index in range(8)]
+        for future in futures:
+            future.result()
+    report['checks']['archive-race'] = script('archive-race-result', 'archive-race-result.php')
+    for name in ['lifecycle', 'admin-lifecycle']:
+        report['checks'][name] = script(name, name + '.php')
     report['checks']['tick-evidence'] = script('tick-evidence', 'tick-evidence.php')
     report['checks']['inactive-mailpoet'] = json.loads(run('inactive-mailpoet', wp + ['--skip-plugins=mailpoet', 'eval',
         'require ' + json.dumps(str(candidate / 'tests/inactive-mailpoet.php')) + ';']))

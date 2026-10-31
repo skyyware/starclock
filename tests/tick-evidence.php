@@ -7,8 +7,8 @@ require_once __DIR__ . '/../src/load.php';
 
 $engine = Starclock\Plugin::engine();
 foreach ($engine->store->plans() as $plan) {
-    if ($plan['status'] !== 'paused' || $engine->store->pending($plan['id'])) {
-        throw new RuntimeException('All synthetic schedules must be paused before the evidence test.');
+    if (!in_array($plan['status'], ['paused', 'archived', 'deleted'], true) || $engine->store->pending($plan['id'])) {
+        throw new RuntimeException('All synthetic schedules must be stopped before the evidence test.');
     }
 }
 if (!has_action(Starclock\Plugin::HOOK)) {
@@ -19,7 +19,7 @@ do_action(Starclock\Plugin::HOOK);
 $checks = [
     'Successful hook retains the internal tick time' => (int)get_option('starclock_last_tick', 0) >= $before,
     'Successful hook clears the internal error' => get_option('starclock_tick_error') === false,
-    'Paused schedules do not register a cron event' => wp_next_scheduled(Starclock\Plugin::HOOK) === false,
+    'Stopped schedules do not register a cron event' => wp_next_scheduled(Starclock\Plugin::HOOK) === false,
 ];
 if (in_array(false, $checks, true)) {
     throw new RuntimeException(json_encode($checks));
