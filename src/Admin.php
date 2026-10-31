@@ -25,7 +25,7 @@ final class Admin
         add_action('admin_post_starclock', [$this, 'submit']);
         add_action('admin_enqueue_scripts', function (string $hook): void {
             if ($hook === 'toplevel_page_starclock') {
-                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.0');
+                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.1');
             }
         });
     }
@@ -102,9 +102,9 @@ final class Admin
             if (!in_array($view, ['plans', 'archive', 'deleted'], true)) {
                 $view = 'plans';
             }
-            echo '<nav class="nav-tab-wrapper sc-tabs" aria-label="Zeitplanansichten">';
+            echo '<nav class="sc-tabs" aria-label="Zeitplanansichten">';
             foreach (['plans' => 'Zeitpläne', 'archive' => 'Archiv', 'deleted' => 'Gelöscht / Nachweise'] as $key => $label) {
-                echo '<a class="nav-tab' . ($key === $view ? ' nav-tab-active' : '') . '"' . ($key === $view ? ' aria-current="page"' : '')
+                echo '<a class="sc-tab"' . ($key === $view ? ' aria-current="page"' : '')
                     . ' href="' . esc_url(admin_url('admin.php?page=starclock&view=' . $key)) . '">' . esc_html($label) . '</a>';
             }
             echo '</nav>';

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 · 2026-10-31
+
+- Refined the three admin views with quieter navigation, a clear current-page indicator, and contrasting keyboard focus.
+- Kept all views in one row on narrow screens with larger touch targets. Labels, URLs, permissions, and scheduling behavior are unchanged.
+
 ## 0.2.0 · 2026-10-31
 
 - Added archive, paused restoration, and confirmed deletion with separate admin views.

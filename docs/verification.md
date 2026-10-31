@@ -1,5 +1,13 @@
 # Verification results
 
+## Release 0.2.1 on 31 October 2026
+
+The three required compatibility combinations passed 130 named assertions each, plus the eight-process reservation check. Six additional rendering checks preserve navigation labels, destinations, the current page, the unknown-view fallback, and archive/deleted detail selection. Five release-gate tests passed. Scheduling, permissions, lifecycle operations, and MailPoet integration code are unchanged.
+
+Native Browser checks covered all three admin views at 1280px, 390px, and 320px. The navigation stays in one row without clipped text or horizontal overflow. Targets are 48px high on desktop and 60px high on narrow screens. Tab, Shift+Tab, Enter, hover, and contrasting keyboard focus were exercised on the installed candidate. These are focused navigation checks, not a full accessibility audit.
+
+The existing local demo record, its revision, and plugin order remained unchanged. No plan was created, archived, restored, or deleted for this visual change. MailPoet and the nonproduction override remained absent; no pending handoff, run, or Starclock cron event was present. The isolated matrix retained its transport denial and passed closeout. No customer or public Stage installation changed.
+
 ## Release 0.2.0 on 31 October 2026
 
 The package passed the three combinations in `tests/matrix.json`: WordPress 7.1.4 / PHP 8.3.36 / MailPoet 5.44.0, and WordPress 7.0.4 / PHP 8.4.27 with MailPoet 5.35.1 and 5.39.0. Each case passed 124 named assertions plus the eight-process reservation check. Five release-gate tests passed.

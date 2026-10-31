@@ -26,6 +26,39 @@ $render = static function (array $query) use ($admin): string {
     $admin->page();
     return ob_get_clean();
 };
+$navigation = static function (string $html, string $current): bool {
+    $document = new DOMDocument();
+    $errorMode = libxml_use_internal_errors(true);
+    try {
+        $loaded = $document->loadHTML('<?xml encoding="UTF-8">' . $html);
+    } finally {
+        libxml_clear_errors();
+        libxml_use_internal_errors($errorMode);
+    }
+    if (!$loaded) {
+        return false;
+    }
+    $xpath = new DOMXPath($document);
+    $links = $xpath->query('//nav[@aria-label="Zeitplanansichten"]/a');
+    $labels = ['plans' => 'Zeitpläne', 'archive' => 'Archiv', 'deleted' => 'Gelöscht / Nachweise'];
+    if ($links->length !== count($labels)) {
+        return false;
+    }
+    foreach (array_keys($labels) as $index => $view) {
+        $link = $links->item($index);
+        if ($link->textContent !== $labels[$view]
+            || $link->getAttribute('href') !== admin_url('admin.php?page=starclock&view=' . $view)
+            || $link->getAttribute('aria-current') !== ($view === $current ? 'page' : '')
+            || $link->hasAttribute('role') || $link->hasAttribute('tabindex')) {
+            return false;
+        }
+    }
+    return true;
+};
+foreach (['plans', 'archive', 'deleted'] as $view) {
+    $check('Navigation preserves labels, targets and current page for ' . $view, $navigation($render(['view' => $view]), $view));
+}
+$check('Unknown view falls back to the working navigation', $navigation($render(['view' => 'unknown']), 'plans'));
 $html = $render([]);
 $check('Plan list offers archive and delete confirmation', str_contains($html, 'value="archive"') && str_contains($html, 'confirm_delete=' . $id));
 $before = $engine->store->plans();
@@ -62,6 +95,7 @@ $plan = $engine->store->plan($id);
 $check('Archive POST persists archived state', $plan['status'] === 'archived');
 $check('Archived plans are absent from the working list', !str_contains($render([]), $source['title']));
 $html = $render(['view' => 'archive']);
+$check('Archived detail selects the archive navigation', $navigation($render(['plan' => $id]), 'archive'));
 $check('Archive view offers paused restoration without editing', str_contains($html, $source['title']) && str_contains($html, 'value="restore"')
     && !str_contains($render(['plan' => $id]), 'name="target"'));
 $post['operation'] = 'restore';
@@ -86,6 +120,7 @@ $check('Deleted plans leave working and archive views', !str_contains($render([]
     && !str_contains($render(['view' => 'archive']), $source['title']));
 $html = $render(['view' => 'deleted']);
 $detail = $render(['plan' => $id]);
+$check('Deleted detail selects the evidence navigation', $navigation($detail, 'deleted'));
 $check('Deleted records remain read-only and findable', str_contains($html, $source['title']) && str_contains($detail, 'Letzte Läufe')
     && !str_contains($detail, 'name="operation"') && !str_contains($detail, 'name="target"'));
 echo json_encode(['checks' => $checks, 'passed' => count($checks)], JSON_PRETTY_PRINT) . "\n";

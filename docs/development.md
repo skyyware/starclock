@@ -63,7 +63,7 @@ python3 bin/verify.py --case current \
   --wp /absolute/path/to/synthetic-wordpress \
   --php /absolute/path/to/php \
   --wp-cli /absolute/path/to/wp-cli.phar \
-  --package .runtime/dist/starclock-0.2.0.zip \
+  --package .runtime/dist/starclock-0.2.1.zip \
   --sandbox /absolute/path/to/isolation.sb
 ```
 
@@ -72,6 +72,8 @@ On Linux, run the command inside the restricted `systemd-run` process described 
 The runner covers scheduling, native MailPoet integration, lost receipts, admin permissions, confirmed deletion, archive and restoration, eight concurrent ticks, eight concurrent reservations, competing archive/tick processes, inactive MailPoet, and retained internal tick evidence. Lifecycle tests check cached versus fresh worker state and attempt archive inside a real recipient batch. It pauses synthetic schedules and checks owned pending handoffs, cron events, and send statistics even after a test failure. After the final case, stop the private database process and retain its evidence. A successful handoff does not prove SMTP acceptance or receipt.
 
 Before UI tests, record the installed version and existing plan IDs. Create only marked synthetic plans with sending disabled. Exercise archive, paused restoration, cancel, and confirmed delete at desktop and narrow widths. Retain their deleted audit records, identify them in the private closeout record, and verify no pending run or cron event remains. Never remove real plans to demonstrate this feature.
+
+For navigation-only changes, reuse the demo's existing records without creating, archiving, or deleting plans. Check all three destinations and their current-page indicator, Tab and Enter navigation, hover, and visible keyboard focus at desktop, 390px, and 320px. Capture comparable native before and after views. Navigation remains ordinary page links, not a JavaScript tab widget.
 
 The current database lock name includes the table prefix, not the database name. Separate databases with the same prefix on one server can therefore return a temporary busy response to each other. Run matrix cases sequentially or use separate database servers. Do not weaken the lock or retry an uncertain handoff to hide this limit.
 
