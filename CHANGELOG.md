@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 · 2026-10-31
+
+- Removed deleted plans and their evidence view from the admin, including old detail and confirmation links.
+- Kept Zeitpläne and Archiv, paused restoration, and histories for existing plans. Internal records and sending guards are unchanged.
+- Simplified delete confirmation and return to the working list after deletion. Adapted narrow-screen navigation to two equal-width links.
+
 ## 0.2.1 · 2026-10-31
 
 - Refined the three admin views with quieter navigation, a clear current-page indicator, and contrasting keyboard focus.

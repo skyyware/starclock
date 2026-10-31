@@ -1,5 +1,15 @@
 # Verification results
 
+## Release 0.2.2 on 31 October 2026
+
+All three combinations in `tests/matrix.json` passed 148 named assertions each, plus the eight-process reservation check. Five release-gate tests passed. The new visibility tests first failed against 0.2.1 because it still rendered the deleted-plan view, then passed against 0.2.2.
+
+The admin has two destinations: Zeitpläne and Archiv. Deleted IDs behave like missing IDs, including old confirmation links and combined view/new parameters. The retired `view=deleted` URL returns the working list. Tests cover deleted records with native handoff receipts, preserved internal state, histories for active and archived plans, paused restoration, concise deletion feedback, and the overview redirect. Permission, nonce, stale-revision, and sending-guard checks remain intact. No data migration was added.
+
+Native Browser checks covered both views at 1280px, 390px, and 320px, plus old deleted-plan URLs on the installed local demo. Navigation has 48px targets without clipped labels or horizontal overflow. Tab, Shift+Tab, Enter, hover, and visible keyboard focus passed; narrow-screen links have equal widths. These are focused checks, not a complete accessibility audit.
+
+The demo's existing deleted synthetic record, revision, plugin order, and empty run history remained unchanged. No demo plan was created or deleted. MailPoet and the nonproduction override stayed absent. The isolated matrix passed closeout with no active plans, pending handoffs, cron events, or send statistics; transport remained blocked. No customer installation or public Stage changed during these checks. SMTP delivery and the declared minimum dependency versions remain outside this matrix.
+
 ## Release 0.2.1 on 31 October 2026
 
 The three required compatibility combinations passed 130 named assertions each, plus the eight-process reservation check. Six additional rendering checks preserve navigation labels, destinations, the current page, the unknown-view fallback, and archive/deleted detail selection. Five release-gate tests passed. Scheduling, permissions, lifecycle operations, and MailPoet integration code are unchanged.

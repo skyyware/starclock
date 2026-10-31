@@ -11,7 +11,7 @@ final class Admin
     private const STATES = ['paused' => 'Pausiert', 'ready' => 'Geprüft', 'active' => 'Aktiv', 'needs_review' => 'Prüfung nötig',
         'claimed' => 'Reserviert', 'handing_over' => 'Übergabe offen', 'queued' => 'An MailPoet übergeben', 'skipped' => 'Ausgelassen',
         'expired' => 'Zeitfenster abgelaufen', 'completed' => 'In MailPoet abgeschlossen', 'cancelled' => 'Abgebrochen', 'closed' => 'Geschlossen',
-        'archived' => 'Archiviert', 'deleted' => 'Gelöscht'];
+        'archived' => 'Archiviert'];
 
     public function __construct(private Engine $engine, private string $file)
     {
@@ -25,7 +25,7 @@ final class Admin
         add_action('admin_post_starclock', [$this, 'submit']);
         add_action('admin_enqueue_scripts', function (string $hook): void {
             if ($hook === 'toplevel_page_starclock') {
-                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.1');
+                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.2');
             }
         });
     }
@@ -56,7 +56,11 @@ final class Admin
             } else {
                 $this->engine->action($id, $revision, $action, Plugin::now());
             }
-            set_transient('starclock_notice_' . get_current_user_id(), ['ok' => true, 'text' => 'Änderung gespeichert.'], 60);
+            if ($action === 'delete') {
+                $id = 0;
+            }
+            set_transient('starclock_notice_' . get_current_user_id(), ['ok' => true,
+                'text' => $action === 'delete' ? 'Zeitplan gelöscht.' : 'Änderung gespeichert.'], 60);
         } catch (Throwable $error) {
             set_transient('starclock_notice_' . get_current_user_id(), ['ok' => false, 'text' => $error->getMessage()], 60);
         }
@@ -93,21 +97,25 @@ final class Admin
             echo '<div class="notice ' . ($notice['ok'] ? 'notice-success' : 'notice-error') . '"><p>' . esc_html($notice['text']) . '</p></div>';
         }
         try {
-            $plans = $this->engine->store->plans();
+            $plans = array_column(array_filter($this->engine->store->plans(),
+                static fn(array $item): bool => $item['status'] !== 'deleted'), null, 'id');
             $selected = absint($_GET['plan'] ?? 0);
-            $plan = $selected ? $this->engine->store->plan($selected) : null;
+            $plan = $plans[$selected] ?? null;
             $view = $plan ? match ($plan['status']) {
-                'archived' => 'archive', 'deleted' => 'deleted', default => 'plans',
+                'archived' => 'archive', default => 'plans',
             } : sanitize_key($_GET['view'] ?? 'plans');
-            if (!in_array($view, ['plans', 'archive', 'deleted'], true)) {
+            if (!in_array($view, ['plans', 'archive'], true)) {
                 $view = 'plans';
             }
             echo '<nav class="sc-tabs" aria-label="Zeitplanansichten">';
-            foreach (['plans' => 'Zeitpläne', 'archive' => 'Archiv', 'deleted' => 'Gelöscht / Nachweise'] as $key => $label) {
+            foreach (['plans' => 'Zeitpläne', 'archive' => 'Archiv'] as $key => $label) {
                 echo '<a class="sc-tab"' . ($key === $view ? ' aria-current="page"' : '')
                     . ' href="' . esc_url(admin_url('admin.php?page=starclock&view=' . $key)) . '">' . esc_html($label) . '</a>';
             }
             echo '</nav>';
+            if ($selected && !$plan) {
+                throw new \RuntimeException('Dieser Zeitplan wurde nicht gefunden.');
+            }
             if (isset($_GET['new'])) {
                 $this->editor(null);
             } elseif ($plan) {
@@ -115,19 +123,19 @@ final class Admin
                     $this->confirmDelete($plan);
                 } else {
                     $this->card($plan, true);
-                    if (!in_array($plan['status'], ['archived', 'deleted'], true)) {
+                    if ($plan['status'] !== 'archived') {
                         $this->editor($plan);
                     }
                 }
                 $this->history($plan);
             } else {
                 $plans = array_filter($plans, static fn(array $item): bool => match ($view) {
-                    'archive' => $item['status'] === 'archived', 'deleted' => $item['status'] === 'deleted',
-                    default => !in_array($item['status'], ['archived', 'deleted'], true),
+                    'archive' => $item['status'] === 'archived',
+                    default => $item['status'] !== 'archived',
                 });
                 if (!$plans) {
                     echo '<p class="sc-empty">' . match ($view) {
-                        'archive' => 'Keine archivierten Zeitpläne.', 'deleted' => 'Keine gelöschten Zeitpläne.',
+                        'archive' => 'Keine archivierten Zeitpläne.',
                         default => 'Keine Zeitpläne. Lege einen neuen Zeitplan an.',
                     } . '</p>';
                 }
@@ -146,14 +154,6 @@ final class Admin
     private function card(array $plan, bool $detail): void
     {
         echo '<section class="sc-card"><div class="sc-card-heading"><h2>' . esc_html($plan['title']) . '</h2><span class="sc-state sc-' . esc_attr($plan['status']) . '">' . esc_html(self::STATES[$plan['status']] ?? $plan['status']) . '</span></div>';
-        if ($plan['status'] === 'deleted') {
-            echo '<p>Gelöscht am ' . esc_html(wp_date('d.m.Y · H:i', $plan['deleted_at'])) . '</p><p>Die Planung ist entfernt. Laufnachweise bleiben erhalten.</p>';
-            if (!$detail) {
-                echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=starclock&plan=' . $plan['id'])) . '">Nachweise ansehen</a>';
-            }
-            echo '</section>';
-            return;
-        }
         $next = $plan['status'] === 'archived' ? null : $this->engine->next($plan, Plugin::now());
         echo '<p class="sc-schedule">' . esc_html(self::DAYS[$plan['weekday']] . ' · ' . $plan['time'] . ' Uhr') . '</p>';
         echo '<p>' . esc_html($plan['timezone']) . ' · ab ' . esc_html(wp_date('d.m.Y', strtotime($plan['start_date'] . ' 12:00 UTC'))) . '</p>';
@@ -216,9 +216,9 @@ final class Admin
             return;
         }
         echo '<section class="sc-card sc-delete-confirm"><h2>Zeitplan löschen?</h2><p><strong>' . esc_html($plan['title']) . '</strong></p>';
-        echo '<p>Die Planung wird dauerhaft entfernt und kann nicht wiederhergestellt werden. Laufnachweise bleiben erhalten. MailPoet-Vorlagen, Kampagnen, Listen und Kontakte werden nicht gelöscht.</p>';
+        echo '<p>Dieser Zeitplan kann danach nicht wiederhergestellt werden. Inhalte und Kontakte in MailPoet bleiben unverändert.</p>';
         $this->formStart($plan, 'delete');
-        echo '<div class="sc-actions"><button class="button sc-delete-button" name="confirm_delete" value="' . esc_attr((string)$plan['id']) . '">Zeitplan endgültig löschen</button>';
+        echo '<div class="sc-actions"><button class="button sc-delete-button" name="confirm_delete" value="' . esc_attr((string)$plan['id']) . '">Zeitplan löschen</button>';
         echo '<a class="button" href="' . esc_url(admin_url('admin.php?page=starclock&plan=' . $plan['id'])) . '">Abbrechen</a></div></form></section>';
     }
 

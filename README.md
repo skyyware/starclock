@@ -2,7 +2,7 @@
 
 Schedule recurring emails in WordPress. MailPoet manages content, mailing lists, unsubscribes, and delivery. Starclock adds weekly schedules, pause controls, and a record of each handoff.
 
-Version 0.2.0. New schedules are disabled. Installation does not enable sending or create a server cron job.
+Version 0.2.2. New schedules are disabled. Installation does not enable sending or create a server cron job.
 
 Open source under the [MIT license](LICENSE). No license fees, license keys, or license activation. Retain the copyright and license notice when redistributing the plugin. WordPress and MailPoet retain their own licenses and are not bundled.
 
@@ -10,7 +10,7 @@ Open source under the [MIT license](LICENSE). No license fees, license keys, or 
 
 The current Starclock admin uses German labels. The steps below retain those labels so you can find each control.
 
-1. Install and activate `starclock-0.2.0.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
+1. Install and activate `starclock-0.2.2.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
 2. Create a standard newsletter draft in MailPoet. Set its subject, lists, sender, reply-to address, and unsubscribe link. Keep this draft as the template.
 3. Under **Starclock → Neuer Zeitplan** (new schedule), select the template and weekly time. Check the time zone, start date, and sending window. Select **Pausiert speichern** (save paused).
 4. Select **Vorlage und Zeitplan prüfen** (check template and schedule). Check the displayed recipients and sender. Review the content in MailPoet.
@@ -28,9 +28,9 @@ Open **Starclock → Zeitpläne**. Select **Archivieren** to stop future runs an
 
 Under **Archiv**, select **Pausiert wiederherstellen** to return a plan to the working list. Restoration never enables sending. Check the template and explicitly enable the plan again when ready.
 
-To remove an unnecessary plan, pause or archive it, select **Löschen…**, and confirm **Zeitplan endgültig löschen**. **Abbrechen** leaves the plan unchanged. Active plans and unresolved handoffs cannot be deleted. Resolve ambiguous handoffs in MailPoet and Starclock first.
+To remove an unnecessary plan, pause or archive it, select **Löschen…**, and confirm **Zeitplan löschen**. **Abbrechen** leaves the plan unchanged. Active plans and unresolved handoffs cannot be deleted. Resolve ambiguous handoffs in MailPoet and Starclock first.
 
-Deletion removes the schedule settings, not MailPoet templates, campaigns, lists, or contacts. **Gelöscht / Nachweise** retains the plan identity and run receipts. These records are read-only and cannot be restored. Retained campaign ownership keeps the recipient guard effective.
+Deleted plans disappear from the admin and cannot be opened through old links or restored. Deletion removes schedule settings, not MailPoet templates, campaigns, lists, or contacts. Minimal internal records and run receipts remain outside the visible admin to preserve campaign ownership and the recipient guard. Histories for existing and archived plans remain available.
 
 ## Operation
 

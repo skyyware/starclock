@@ -40,7 +40,7 @@ The temporary `STARCLOCK_ALLOW_NONPRODUCTION` constant permits activation only f
 The WordPress owner maintains the product and its demo together. Run this procedure when code, a supported dependency, or the demo installation changes. No scheduled refresh, repository pipeline, or unattended customer update is part of this procedure.
 
 1. Confirm the current installation versions with the installation owner. Update `tests/matrix.json` when a required combination changes. Keep customer mappings and demo addresses in the private WordPress repository.
-2. Update the plugin version, CSS cache version, changelog, and relevant documentation. Build the candidate with `python3 bin/package.py`.
+2. Update the plugin version, README version and installation filename, CSS cache version, changelog, and relevant documentation. Build the candidate with `python3 bin/package.py`.
 3. Run every matrix case against a separate synthetic database. Use the exact PHP, WordPress, and MailPoet versions from the matrix. Run cases sequentially when they share a database server. Keep the OS transport block in place throughout.
 4. Check the actual installed ZIP: activate, deactivate, reactivate, and compare every installed file with the archive. Inspect the admin at desktop and narrow widths. Verify missing MailPoet, invalid forms, and permission denial.
 5. Run `python3 tests/release-gate.py`. Then pass the package and one successful report per matrix case to `python3 bin/release_check.py PACKAGE REPORT_CURRENT REPORT_PREVIOUS REPORT_REGRESSION`. Changed package bytes, test code, dependency versions, missing checks, or incomplete closeout invalidate the evidence.
@@ -63,7 +63,7 @@ python3 bin/verify.py --case current \
   --wp /absolute/path/to/synthetic-wordpress \
   --php /absolute/path/to/php \
   --wp-cli /absolute/path/to/wp-cli.phar \
-  --package .runtime/dist/starclock-0.2.1.zip \
+  --package .runtime/dist/starclock-0.2.2.zip \
   --sandbox /absolute/path/to/isolation.sb
 ```
 
@@ -71,9 +71,9 @@ On Linux, run the command inside the restricted `systemd-run` process described 
 
 The runner covers scheduling, native MailPoet integration, lost receipts, admin permissions, confirmed deletion, archive and restoration, eight concurrent ticks, eight concurrent reservations, competing archive/tick processes, inactive MailPoet, and retained internal tick evidence. Lifecycle tests check cached versus fresh worker state and attempt archive inside a real recipient batch. It pauses synthetic schedules and checks owned pending handoffs, cron events, and send statistics even after a test failure. After the final case, stop the private database process and retain its evidence. A successful handoff does not prove SMTP acceptance or receipt.
 
-Before UI tests, record the installed version and existing plan IDs. Create only marked synthetic plans with sending disabled. Exercise archive, paused restoration, cancel, and confirmed delete at desktop and narrow widths. Retain their deleted audit records, identify them in the private closeout record, and verify no pending run or cron event remains. Never remove real plans to demonstrate this feature.
+Before UI tests, record the installed version and existing plan IDs. Create only marked synthetic plans with sending disabled. Exercise archive, paused restoration, cancel, and confirmed delete at desktop and narrow widths. Deleted plans must disappear from every visible view, including old detail and confirmation URLs; they must behave like missing IDs. Verify histories still render for existing and archived plans. Retain internal deleted records, identify them in the private closeout record, and verify no pending run or cron event remains. Never remove real plans to demonstrate this feature.
 
-For navigation-only changes, reuse the demo's existing records without creating, archiving, or deleting plans. Check all three destinations and their current-page indicator, Tab and Enter navigation, hover, and visible keyboard focus at desktop, 390px, and 320px. Capture comparable native before and after views. Navigation remains ordinary page links, not a JavaScript tab widget.
+For visibility and navigation changes, reuse the demo's existing records without creating, archiving, or deleting plans. Check Zeitpläne and Archiv, the retired `view=deleted` URL, and an old deleted-plan link. Check the current-page indicator, Tab and Enter navigation, hover, and visible keyboard focus at desktop, 390px, and 320px. Capture comparable native before and after views. Navigation remains ordinary page links, not a JavaScript tab widget.
 
 The current database lock name includes the table prefix, not the database name. Separate databases with the same prefix on one server can therefore return a temporary busy response to each other. Run matrix cases sequentially or use separate database servers. Do not weaken the lock or retry an uncertain handoff to hide this limit.
 
