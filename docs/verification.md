@@ -1,5 +1,15 @@
 # Verification results
 
+## Release 0.2.3 on 10 November 2026
+
+The required matrix now includes MailPoet 5.45.1 and retains 5.44.0, 5.39.0, and 5.35.1. Package-bound reports must pass every case before release. The regression first failed against 0.2.2 because a blocked plan removed its tick. The real 5.45.1 installation also reproduced 0.2.2's exact-version rejection before the compatibility change.
+
+All four combinations passed 191 named assertions each, plus the eight-process reservation check. Five release-gate tests passed. Closeout found no active synthetic plan, pending owned handoff, Starclock cron event, or newsletter send statistics. The final package is checked again after documentation changes; earlier package hashes cannot authorize release.
+
+New checks cover two consecutive Mondays after a native completed first task, fresh subscribers, distinct receipts, and repeated ticks. Completion is a controlled provider-state fixture with transport blocked, not a claim of delivered test mail. A separate fault-injection check covers unverified-version drift, continued diagnostics, no automatic recovery, a manually sent master, a new draft, explicit review and activation, no missed-date catch-up, and retained protection for the completed campaign.
+
+Diagnostics use native WordPress notices and Site Health. Tests cover missing legacy cron registration, persistent errors, permissions, escaped text, unknown versions, and offered-update warnings without altering security-update policy. No customer data or real recipient is used. Final report paths, package hashes, installed demo evidence, and any remaining limits belong to the private owner record.
+
 ## Release 0.2.2 on 31 October 2026
 
 All three combinations in `tests/matrix.json` passed 148 named assertions each, plus the eight-process reservation check. Five release-gate tests passed. The new visibility tests first failed against 0.2.1 because it still rendered the deleted-plan view, then passed against 0.2.2.

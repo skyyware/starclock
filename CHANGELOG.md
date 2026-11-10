@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3 · 2026-11-10
+
+- Added exact MailPoet 5.45.1 compatibility coverage alongside all previously tested versions.
+- Kept the existing diagnostic tick for blocked plans and repaired missing legacy ticks without reactivating schedules.
+- Retained plan errors after a completed tick. Added persistent admin and native Site Health diagnostics, including warnings for offered untested MailPoet updates. Security-update policy is unchanged.
+- Added native consecutive-week completion, newly confirmed subscribers, dependency-drift recovery, sent-template preservation, no-catch-up, and duplicate-prevention checks.
+
 ## 0.2.2 · 2026-10-31
 
 - Removed deleted plans and their evidence view from the admin, including old detail and confirmation links.

@@ -49,7 +49,7 @@ final class Plugin
 
     public static function syncCron(Engine $engine): void
     {
-        $active = array_filter($engine->store->plans(), static fn(array $plan): bool => $plan['status'] === 'active');
+        $active = array_filter($engine->store->plans(), static fn(array $plan): bool => in_array($plan['status'], ['active', 'needs_review'], true));
         if (!$active) {
             wp_clear_scheduled_hook(self::HOOK);
         } elseif (!wp_next_scheduled(self::HOOK)) {
@@ -60,18 +60,43 @@ final class Plugin
         }
     }
 
+    public static function ensureCron(): void
+    {
+        try {
+            self::syncCron(self::engine());
+        } catch (Throwable $error) {
+            update_option('starclock_tick_error', sanitize_text_field($error->getMessage()), false);
+        }
+    }
+
     public static function boot(string $file): void
     {
         add_filter('cron_schedules', static function (array $schedules): array {
             $schedules['starclock_minute'] = ['interval' => 60, 'display' => 'Starclock: jede Minute'];
             return $schedules;
         });
+        add_action('init', [self::class, 'ensureCron']);
+        add_filter('site_status_tests', static function (array $tests): array {
+            $tests['direct']['starclock'] = ['label' => 'Starclock-Zeitpläne',
+                'test' => static fn(): array => (new Diagnostics(self::engine()))->siteHealth()];
+            return $tests;
+        });
         add_action(self::HOOK, static function (): void {
             try {
                 $engine = self::engine();
-                $engine->tick(self::now());
+                $outcomes = $engine->tick(self::now());
                 update_option('starclock_last_tick', time(), false);
-                delete_option('starclock_tick_error');
+                $errors = array_column(array_filter($outcomes, static fn(array $run): bool => $run['state'] === 'needs_review'), 'message');
+                foreach ($engine->store->plans() as $plan) {
+                    if ($plan['status'] === 'needs_review') {
+                        $errors[] = $plan['notice'] ?? 'Ein Zeitplan benötigt eine Prüfung.';
+                    }
+                }
+                if ($errors) {
+                    update_option('starclock_tick_error', sanitize_text_field(implode(' ', array_unique($errors))), false);
+                } else {
+                    delete_option('starclock_tick_error');
+                }
                 self::syncCron($engine);
             } catch (Throwable $error) {
                 update_option('starclock_tick_error', sanitize_text_field($error->getMessage()), false);
@@ -87,6 +112,7 @@ final class Plugin
         }, 100, 2);
         if (is_admin()) {
             (new Admin(self::engine(), $file))->hooks();
+            add_action('admin_notices', [new Diagnostics(self::engine()), 'notice']);
         }
     }
 }

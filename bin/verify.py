@@ -64,7 +64,7 @@ try:
         raise RuntimeError(f'Expected {matrix[args.case]}, got {report["environment"]}')
     safe_to_test = True
     report['checks']['unit'] = json.loads(run('unit', php + [str(candidate / 'tests/unit.php')]))
-    for name in ['integration', 'handoff-failure', 'admin-security']:
+    for name in ['integration', 'version-drift', 'handoff-failure', 'admin-security']:
         report['checks'][name] = script(name, name + '.php')
     setup = script('race-setup', 'race-setup.php')
     env['STARCLOCK_RACE_PLAN'] = str(setup['plan_id'])
@@ -88,7 +88,7 @@ try:
         for future in futures:
             future.result()
     report['checks']['archive-race'] = script('archive-race-result', 'archive-race-result.php')
-    for name in ['lifecycle', 'admin-lifecycle']:
+    for name in ['lifecycle', 'admin-lifecycle', 'diagnostics']:
         report['checks'][name] = script(name, name + '.php')
     report['checks']['tick-evidence'] = script('tick-evidence', 'tick-evidence.php')
     report['checks']['inactive-mailpoet'] = json.loads(run('inactive-mailpoet', wp + ['--skip-plugins=mailpoet', 'eval',

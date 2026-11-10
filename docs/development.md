@@ -43,7 +43,7 @@ The WordPress owner maintains the product and its demo together. Run this proced
 2. Update the plugin version, README version and installation filename, CSS cache version, changelog, and relevant documentation. Build the candidate with `python3 bin/package.py`.
 3. Run every matrix case against a separate synthetic database. Use the exact PHP, WordPress, and MailPoet versions from the matrix. Run cases sequentially when they share a database server. Keep the OS transport block in place throughout.
 4. Check the actual installed ZIP: activate, deactivate, reactivate, and compare every installed file with the archive. Inspect the admin at desktop and narrow widths. Verify missing MailPoet, invalid forms, and permission denial.
-5. Run `python3 tests/release-gate.py`. Then pass the package and one successful report per matrix case to `python3 bin/release_check.py PACKAGE REPORT_CURRENT REPORT_PREVIOUS REPORT_REGRESSION`. Changed package bytes, test code, dependency versions, missing checks, or incomplete closeout invalidate the evidence.
+5. Run `python3 tests/release-gate.py`. Then pass the package and one successful report per matrix case to `python3 bin/release_check.py PACKAGE REPORT_CURRENT REPORT_BASELINE REPORT_PREVIOUS REPORT_REGRESSION`. Changed package bytes, test code, dependency versions, missing checks, or incomplete closeout invalidate the evidence.
 6. Install the same candidate ZIP on the maintained demo. Record its previous version and active plugin order first. Keep MailPoet absent or inactive, schedules paused, and the nonproduction override absent. Compare installed files and verify the actual admin. Do not change unrelated plugins, users, settings, or content.
 7. Audit the Git diff and ZIP for customer information and secrets. Commit and push explicit paths. Tag the verified source revision and upload the unchanged ZIP and checksum manifest through the existing manual release route. Keep GitHub Actions and dependency automation disabled.
 8. Read back the published checksum and demo version. Record the package hash, source revision, checks, demo result, and recovery path in the private owner record. Send the customer owner the verified release and any limits. Customer installation and sending authorization remain with that owner.
@@ -63,13 +63,19 @@ python3 bin/verify.py --case current \
   --wp /absolute/path/to/synthetic-wordpress \
   --php /absolute/path/to/php \
   --wp-cli /absolute/path/to/wp-cli.phar \
-  --package .runtime/dist/starclock-0.2.2.zip \
+  --package .runtime/dist/starclock-0.2.3.zip \
   --sandbox /absolute/path/to/isolation.sb
 ```
 
 On Linux, run the command inside the restricted `systemd-run` process described below and omit `--sandbox`. The PHP guard refuses unrestricted processes before fixture creation. The runner extracts the candidate ZIP, adds only the source tests to its temporary copy, and checks those packaged classes. It saves results under `.runtime/verification/CASE/`, including the ZIP hash, test-suite hash, exact runtime versions, and closeout result.
 
 The runner covers scheduling, native MailPoet integration, lost receipts, admin permissions, confirmed deletion, archive and restoration, eight concurrent ticks, eight concurrent reservations, competing archive/tick processes, inactive MailPoet, and retained internal tick evidence. Lifecycle tests check cached versus fresh worker state and attempt archive inside a real recipient batch. It pauses synthetic schedules and checks owned pending handoffs, cron events, and send statistics even after a test failure. After the final case, stop the private database process and retain its evidence. A successful handoff does not prove SMTP acceptance or receipt.
+
+Consecutive-week tests use native MailPoet campaigns and receipts. They set the first synthetic task to completed without transport, then verify the next Monday, current list membership, and repeated ticks. The dependency-drift test injects an unverified adapter version, restores compatibility without automatic activation, refuses a manually sent master, and resumes only after explicit review with a separate draft. It verifies no catch-up and no renewed permission for the completed campaign. This proves scheduler and provider-state handling, not actual email delivery or a real provider upgrade transaction.
+
+The diagnostics check covers missing legacy ticks, blocked-plan errors, admin authorization and escaping, native Site Health, unknown-version rejection, and offered-update warnings. It restores its synthetic update offer, current user, and diagnostic options. Do not change automatic-update policy to make a compatibility test pass.
+
+The native Site Health extension follows the [WordPress hook contract](https://developer.wordpress.org/reference/hooks/site_status_tests/) (checked 10 November 2026). Update warnings read the existing update offer; no extra remote lookup, mail, or scheduled job is added. A green status does not establish transport delivery.
 
 Before UI tests, record the installed version and existing plan IDs. Create only marked synthetic plans with sending disabled. Exercise archive, paused restoration, cancel, and confirmed delete at desktop and narrow widths. Deleted plans must disappear from every visible view, including old detail and confirmation URLs; they must behave like missing IDs. Verify histories still render for existing and archived plans. Retain internal deleted records, identify them in the private closeout record, and verify no pending run or cron event remains. Never remove real plans to demonstrate this feature.
 

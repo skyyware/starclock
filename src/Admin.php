@@ -25,7 +25,7 @@ final class Admin
         add_action('admin_post_starclock', [$this, 'submit']);
         add_action('admin_enqueue_scripts', function (string $hook): void {
             if ($hook === 'toplevel_page_starclock') {
-                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.2');
+                wp_enqueue_style('starclock-admin', plugins_url('assets/admin.css', $this->file), [], '0.2.3');
             }
         });
     }

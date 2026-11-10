@@ -2,7 +2,7 @@
 
 Schedule recurring emails in WordPress. MailPoet manages content, mailing lists, unsubscribes, and delivery. Starclock adds weekly schedules, pause controls, and a record of each handoff.
 
-Version 0.2.2. New schedules are disabled. Installation does not enable sending or create a server cron job.
+Version 0.2.3. New schedules are disabled. Installation does not enable sending or create a server cron job.
 
 Open source under the [MIT license](LICENSE). No license fees, license keys, or license activation. Retain the copyright and license notice when redistributing the plugin. WordPress and MailPoet retain their own licenses and are not bundled.
 
@@ -10,7 +10,7 @@ Open source under the [MIT license](LICENSE). No license fees, license keys, or 
 
 The current Starclock admin uses German labels. The steps below retain those labels so you can find each control.
 
-1. Install and activate `starclock-0.2.2.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
+1. Install and activate `starclock-0.2.3.zip` through WordPress **Plugins → Add New Plugin → Upload Plugin**.
 2. Create a standard newsletter draft in MailPoet. Set its subject, lists, sender, reply-to address, and unsubscribe link. Keep this draft as the template.
 3. Under **Starclock → Neuer Zeitplan** (new schedule), select the template and weekly time. Check the time zone, start date, and sending window. Select **Pausiert speichern** (save paused).
 4. Select **Vorlage und Zeitplan prüfen** (check template and schedule). Check the displayed recipients and sender. Review the content in MailPoet.
@@ -38,7 +38,7 @@ Deleted plans disappear from the admin and cannot be opened through old links or
 - The MailPoet adapter accepts only verified versions. Handoffs remain blocked on other versions. The allowed version range never expands automatically.
 - Weekly schedules use an IANA time zone such as `Europe/Berlin`. A time skipped by a daylight-saving transition is omitted. A repeated time runs once, at its first occurrence.
 - The sending window limits late handoffs and pending recipients. It ends no later than midnight. Missed days are not retried.
-- Without an external trigger, WordPress-Cron depends on page visits. The operator must configure and verify the hosting provider's trigger. The internal options `starclock_last_tick` and `starclock_tick_error` retain diagnostic evidence. They are not shown in the schedule admin. See the [WordPress cron documentation](https://developer.wordpress.org/plugins/cron/).
+- Without an external trigger, WordPress-Cron depends on page visits. The operator must configure and verify the hosting provider's trigger. The internal options `starclock_last_tick` and `starclock_tick_error` retain diagnostic evidence. Blocked plans and missing or overdue ticks appear in persistent admin notices and **Tools → Site Health**. See the [WordPress cron documentation](https://developer.wordpress.org/plugins/cron/).
 - A changed website host or a non-production environment blocks execution. Before cloning a site, also isolate MailPoet and the mail transport.
 - Changes require site-management and MailPoet email-management permissions, a valid WordPress nonce, and the current edit revision.
 - Starclock stores schedules, template metadata, and run receipts in the site's WordPress database. It does not copy recipient lists or collect telemetry.
@@ -46,6 +46,10 @@ Deleted plans disappear from the admin and cannot be opened through old links or
 ## Maintenance
 
 Install updates manually from a verified ZIP. There is no remote control or automatic GitHub updater. Deactivation first pauses pending MailPoet campaigns owned by Starclock. If that fails, Starclock blocks deactivation to preserve the protection against late sending.
+
+Before a MailPoet update, check the exact target version against `MailPoetAdapter::TESTED_VERSIONS` and the [release compatibility matrix](https://github.com/skyyware/starclock/blob/v0.2.3/tests/matrix.json). An offered untested update produces an admin warning while plans are active or blocked. Starclock does not disable WordPress security updates or change the site's auto-update policy. The operator must coordinate dependency updates with compatibility testing; a warning is not an update gate.
+
+An unverified MailPoet version stops execution. Blocked plans retain the diagnostic tick, and initialization repairs a missing tick from an older release. Neither step activates a plan or sends mail. After installing a compatible Starclock release, inspect the plan and any provider receipts, check the template again, and explicitly activate it. Missed occurrences are not replayed. If the original draft was sent manually, preserve it and select a separate unpublished draft for future runs. An update alone never restores sending permission.
 
 Schedules and run receipts survive plugin deactivation and removal. They prevent duplicate handoffs after reinstallation. Archived and deleted plans keep their state during deactivation. Do not downgrade below 0.2.0 after archiving or deleting plans: earlier versions do not understand those states. A code rollback alone does not restore data.
 

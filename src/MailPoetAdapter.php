@@ -14,7 +14,7 @@ use RuntimeException;
 
 final class MailPoetAdapter implements Adapter
 {
-    public const TESTED_VERSIONS = ['5.35.1', '5.39.0', '5.44.0'];
+    public const TESTED_VERSIONS = ['5.35.1', '5.39.0', '5.44.0', '5.45.1'];
 
     public function id(): string
     {
@@ -31,9 +31,16 @@ final class MailPoetAdapter implements Adapter
         if (!defined('MAILPOET_VERSION') || !class_exists(ContainerWrapper::class)) {
             throw new RuntimeException('MailPoet ist nicht aktiv. Der Zeitplan bleibt pausiert.');
         }
-        if (!in_array(MAILPOET_VERSION, self::TESTED_VERSIONS, true)) {
-            throw new RuntimeException('Diese MailPoet-Version ist noch nicht geprüft. Bitte Starclock aktualisieren oder die Kompatibilität prüfen lassen.');
+        if ($problem = self::compatibilityProblem(MAILPOET_VERSION)) {
+            throw new RuntimeException($problem);
         }
+    }
+
+    public static function compatibilityProblem(string $version): ?string
+    {
+        return in_array($version, self::TESTED_VERSIONS, true) ? null
+            : 'MailPoet ' . $version . ' ist mit dieser Starclock-Version noch nicht geprüft. Versand gesperrt. '
+                . 'Starclock aktualisieren oder die Kompatibilität prüfen lassen; danach Vorlage und Zeitplan erneut prüfen und aktivieren.';
     }
 
     private function service(string $class): object
