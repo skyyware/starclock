@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4 - 2026-11-17
+
+- Added exact MailPoet 5.45.2 compatibility and retained all four existing matrix combinations.
+- Added explicit checks for the supported patch and rejected prerelease and untested patch versions.
+- Kept scheduling, receipts, update policy, and explicit review and activation unchanged. Updating the plugin does not resume a paused plan or replay missed mail.
+
 ## 0.2.3 · 2026-11-10
 
 - Added exact MailPoet 5.45.1 compatibility coverage alongside all previously tested versions.

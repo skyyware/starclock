@@ -60,7 +60,8 @@ try {
     $check('Diagnostics escape untrusted plan and error text', !str_contains($html, '<b>version</b>') && str_contains($html, '&lt;b&gt;version&lt;/b&gt;'));
     $check('Unknown MailPoet versions are still rejected', MailPoetAdapter::compatibilityProblem('999.0.0') !== null);
     $check('The installed matrix version is approved', MailPoetAdapter::compatibilityProblem(MAILPOET_VERSION) === null);
-    foreach (['', '5.45', '5.45.1-beta', '5.45.2', '6.0.0'] as $version) {
+    $check('The exact MailPoet 5.45.2 release is approved', MailPoetAdapter::compatibilityProblem('5.45.2') === null);
+    foreach (['', '5.45', '5.45.1-beta', '5.45.2-beta', '5.45.3', '6.0.0'] as $version) {
         $check('Unverified version is not broadly approved: ' . $version, MailPoetAdapter::compatibilityProblem($version) !== null);
     }
     $plan['status'] = 'active';

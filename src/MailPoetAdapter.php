@@ -14,7 +14,7 @@ use RuntimeException;
 
 final class MailPoetAdapter implements Adapter
 {
-    public const TESTED_VERSIONS = ['5.35.1', '5.39.0', '5.44.0', '5.45.1'];
+    public const TESTED_VERSIONS = ['5.35.1', '5.39.0', '5.44.0', '5.45.1', '5.45.2'];
 
     public function id(): string
     {

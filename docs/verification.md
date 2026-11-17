@@ -1,5 +1,17 @@
 # Verification results
 
+## Release 0.2.4 on 17 November 2026
+
+The matrix adds WordPress 7.1.4 / PHP 8.3.36 / MailPoet 5.45.2 and retains all four previously tested combinations. Each case passed 193 named assertions including closeout, plus the eight-process reservation check. Five release-gate tests passed. Reports are bound to the final ZIP and test-suite hashes.
+
+The unchanged 0.2.3 adapter first rejected the real 5.45.2 installation with its exact-version error. The new checks accept exactly 5.45.2 while rejecting 5.45.2-beta, untested 5.45.3, incomplete versions, and a future major version. Existing checks cover consecutive weeks, dependency drift, manually sent masters, explicit recovery, no catch-up, retained receipts, and duplicate handoffs. Scheduling, persistence, transport ownership, and automatic-update policy are unchanged.
+
+The official [MailPoet 5.45.2 ZIP](https://downloads.wordpress.org/plugin/mailpoet.5.45.2.zip), downloaded on 17 November, has SHA256 `6e1ba8c05ab244c709f7831bcd333b3fd833e19df92ee85ea1ab999b1f6d7224`. Ten compared provider files for the adapter, queue worker, and receipt entities are byte-identical to 5.45.1. This is a bounded contract comparison, not a full provider audit. The full native integration still runs against each actual installed version.
+
+All tests use synthetic databases, OS network denial, disabled PHP mail, and WordPress transport guards. Every case ends without active synthetic plans, pending owned handoffs, Starclock cron events, or newsletter send statistics. Provider completion and version drift remain controlled fixtures, not SMTP delivery or a real upgrade transaction.
+
+The native Browser was unavailable for this release, so no fresh visual or interactive demo verification is claimed. Installation evidence and the open browser check belong to the private owner record. Existing UI markup and CSS are unchanged. A compatibility update alone never activates a plan or authorizes another mailing.
+
 ## Release 0.2.3 on 10 November 2026
 
 The required matrix now includes MailPoet 5.45.1 and retains 5.44.0, 5.39.0, and 5.35.1. Package-bound reports must pass every case before release. The regression first failed against 0.2.2 because a blocked plan removed its tick. The real 5.45.1 installation also reproduced 0.2.2's exact-version rejection before the compatibility change.
