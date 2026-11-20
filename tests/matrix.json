@@ -1,4 +1,5 @@
 {
+  "wordpress-security": {"wordpress": "7.1.5", "php": "8.3.36", "mailpoet": "5.45.2"},
   "current": {"wordpress": "7.1.4", "php": "8.3.36", "mailpoet": "5.45.2"},
   "previous-current": {"wordpress": "7.1.4", "php": "8.3.36", "mailpoet": "5.45.1"},
   "baseline": {"wordpress": "7.1.4", "php": "8.3.36", "mailpoet": "5.44.0"},

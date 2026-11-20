@@ -1,5 +1,15 @@
 # Verification results
 
+## Additional compatibility evidence on 19 November 2026
+
+The unchanged 0.2.4 ZIP passed the expanded six-case matrix. The added case uses WordPress 7.1.5, PHP 8.3.36, and MailPoet 5.45.2; all five existing combinations remain covered. Each case passed 193 named assertions including closeout, plus eight simultaneous reservations with one winner. Five release-gate tests passed.
+
+Package SHA256 is `36dc374fd55cbe06d34025627b9965b80a5484413a04611a10c987b4dea65ad3`. The expanded suite SHA256 is `1850a29eeb0f95a32f03efb91b4d1a64fb3a24ac0dc6154d8eabcc8a0561e6e5`. On 20 November, the release gate accepted those same six reports against the unchanged package and current suite. No integration test was repeated solely to refresh its date.
+
+All cases used separate synthetic databases, OS network denial, disabled PHP mail, and WordPress transport guards. Closeout found no active synthetic plans, pending owned handoffs, Starclock cron events, or newsletter send statistics. The private database process is stopped, with no socket or PID file remaining.
+
+No plugin code, UI, release archive, tag, or installation changed. No new browser or SMTP verification is claimed. This evidence covers the exact PHP versions in the matrix, not the PHP 8.3.37 and 8.4.28 security releases published afterwards. Those runtimes still need separate compatibility evidence; a passing application matrix is not proof that a PHP security advisory does not apply.
+
 ## Release 0.2.4 on 17 November 2026
 
 The matrix adds WordPress 7.1.4 / PHP 8.3.36 / MailPoet 5.45.2 and retains all four previously tested combinations. Each case passed 193 named assertions including closeout, plus the eight-process reservation check. Five release-gate tests passed. Reports are bound to the final ZIP and test-suite hashes.
