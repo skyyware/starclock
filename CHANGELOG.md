@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5 - 2026-11-24
+
+- Added exact MailPoet 5.46.0 support for recurring standard campaigns. Other untested versions still block sending.
+- Updating Starclock does not change MailPoet, enable a schedule, or replay a missed mailing.
+
 ## 0.2.4 - 2026-11-17
 
 - Added exact MailPoet 5.45.2 compatibility and retained all four existing matrix combinations.

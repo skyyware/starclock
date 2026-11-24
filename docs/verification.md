@@ -1,5 +1,13 @@
 # Verification results
 
+## MailPoet 5.46.0 - 24 November 2026
+
+The published 0.2.4 package rejected an installed MailPoet 5.46.0 on WordPress 7.1.5 and PHP 8.3.36 before creating a plan. The [official MailPoet archive](https://downloads.wordpress.org/plugin/mailpoet.5.46.0.zip) has SHA256 `6df201bfd1759861dda9ddbe037c33f537c803c659b64d260ed19db831a90d06`. All 4,928 files matched the WordPress.org SHA256 manifest. Three of ten compared adapter dependencies changed: the sending queue API, newsletter save controller and newsletter repository. Source comparison alone does not verify sending behavior.
+
+The 0.2.5 release gate requires this exact combination and all six previous matrix cases. Tests exercise MailPoet recipient selection with delivery blocked, duplicate and consecutive-week ticks, untested-version refusal and cleanup. Starclock's clock tests cover the spring gap and repeated autumn hour in Europe/Berlin. They do not certify MailPoet's own timezone campaigns or SMTP delivery.
+
+In the preliminary matrix, each of the seven cases passed 193 named checks plus four closeout checks. Eight concurrent reservations produced one winner per case. Two activation cycles preserved the installed plugin order and retained plan states. Final release evidence must match the actual distributed ZIP; the checksum manifest identifies that artifact.
+
 ## Additional compatibility evidence on 19 November 2026
 
 The unchanged 0.2.4 ZIP passed the expanded six-case matrix. The added case uses WordPress 7.1.5, PHP 8.3.36, and MailPoet 5.45.2; all five existing combinations remain covered. Each case passed 193 named assertions including closeout, plus eight simultaneous reservations with one winner. Five release-gate tests passed.

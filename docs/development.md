@@ -43,7 +43,7 @@ The WordPress owner maintains the product and its demo together. Run this proced
 2. Update the plugin version, README version and installation filename, CSS cache version, changelog, and relevant documentation. Build the candidate with `python3 bin/package.py`.
 3. Run every matrix case against a separate synthetic database. Use the exact PHP, WordPress, and MailPoet versions from the matrix. Run cases sequentially when they share a database server. Keep the OS transport block in place throughout.
 4. Check the actual installed ZIP: activate, deactivate, reactivate, and compare every installed file with the archive. Inspect the admin at desktop and narrow widths. Verify missing MailPoet, invalid forms, and permission denial.
-5. Run `python3 tests/release-gate.py`. Then pass the package and one successful report per matrix case to `python3 bin/release_check.py PACKAGE REPORT_WORDPRESS_SECURITY REPORT_CURRENT REPORT_PREVIOUS_CURRENT REPORT_BASELINE REPORT_PREVIOUS REPORT_REGRESSION`. Changed package bytes, test code, dependency versions, missing checks, or incomplete closeout invalidate the evidence.
+5. Run `python3 tests/release-gate.py`. Then run `python3 bin/release_check.py` with the ZIP path followed by one successful report path for each case in `tests/matrix.json`. Do not omit the new dependency case or substitute a report from another ZIP. Changed package bytes, suite, dependency versions, missing checks, or incomplete closeout invalidate the evidence.
 6. Install the same candidate ZIP on the maintained demo. Record its previous version and active plugin order first. Keep MailPoet absent or inactive, schedules paused, and the nonproduction override absent. Compare installed files and verify the actual admin. Do not change unrelated plugins, users, settings, or content.
 7. Audit the Git diff and ZIP for customer information and secrets. Commit and push explicit paths. Tag the verified source revision and upload the unchanged ZIP and checksum manifest through the existing manual release route. Keep GitHub Actions and dependency automation disabled.
 8. Read back the published checksum and demo version. Record the package hash, source revision, checks, demo result, and recovery path in the private owner record. Send the customer owner the verified release and any limits. Customer installation and sending authorization remain with that owner.
@@ -65,7 +65,7 @@ python3 bin/verify.py --case current \
   --wp /absolute/path/to/synthetic-wordpress \
   --php /absolute/path/to/php \
   --wp-cli /absolute/path/to/wp-cli.phar \
-  --package .runtime/dist/starclock-0.2.4.zip \
+  --package .runtime/dist/starclock-0.2.5.zip \
   --sandbox /absolute/path/to/isolation.sb
 ```
 
